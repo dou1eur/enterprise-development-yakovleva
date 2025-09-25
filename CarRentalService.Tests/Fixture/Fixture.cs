@@ -1,6 +1,6 @@
 ﻿using CarRentalService.Domain.Domain;
 
-namespace CarRentalService.Domain.Fixture
+namespace CarRentalService.Tests.Fixture;
 /// <summary>
 /// Provides test data for car rental service
 /// </summary>
@@ -42,7 +42,7 @@ public class CarRentalFixture
     /// <summary>
     /// Initializes test data by clearing existing data and generating new data
     /// </summary>
-    public void CarRentalFixture()
+    public void Initialize()
     {
         GenerateModels();
         GenerateGenerations();
@@ -58,16 +58,16 @@ public class CarRentalFixture
     {
         Models.AddRange(new[]
         {
-                new VehicleModel { Id = Guid.NewGuid(), Name = "Toyota Camry", DriveType = Domain.DriveType.FWD, SeatCount = 5, BodyType = BodyType.Sedan, VehicleClass = VehicleClass.Family },
-                new VehicleModel { Id = Guid.NewGuid(), Name = "BMW 5 Series", DriveType = Domain.DriveType.RWD, SeatCount = 5, BodyType = BodyType.Sedan, VehicleClass = VehicleClass.Business },
-                new VehicleModel { Id = Guid.NewGuid(), Name = "Mercedes E-Class", DriveType = Domain.DriveType.RWD, SeatCount = 5, BodyType = BodyType.Sedan, VehicleClass = VehicleClass.Luxury },
-                new VehicleModel { Id = Guid.NewGuid(), Name = "Honda Civic", DriveType = Domain.DriveType.FWD, SeatCount = 5, BodyType = BodyType.Hatchback, VehicleClass = VehicleClass.Compact },
-                new VehicleModel { Id = Guid.NewGuid(), Name = "Audi Q7", DriveType = Domain.DriveType.AWD, SeatCount = 7, BodyType = BodyType.SUV, VehicleClass = VehicleClass.SUV },
-                new VehicleModel { Id = Guid.NewGuid(), Name = "Ford Focus", DriveType = Domain.DriveType.FWD, SeatCount = 5, BodyType = BodyType.Hatchback, VehicleClass = VehicleClass.Compact },
-                new VehicleModel { Id = Guid.NewGuid(), Name = "Volkswagen Golf", DriveType = Domain.DriveType.FWD, SeatCount = 5, BodyType = BodyType.Hatchback, VehicleClass = VehicleClass.Compact },
-                new VehicleModel { Id = Guid.NewGuid(), Name = "Toyota RAV4", DriveType = Domain.DriveType.AWD, SeatCount = 5, BodyType = BodyType.SUV, VehicleClass = VehicleClass.SUV },
-                new VehicleModel { Id = Guid.NewGuid(), Name = "Chevrolet Cobalt", DriveType = Domain.DriveType.FWD, SeatCount = 5, BodyType = BodyType.Sedan, VehicleClass = VehicleClass.Compact },
-                new VehicleModel { Id = Guid.NewGuid(), Name = "BMW X5", DriveType = Domain.DriveType.AWD, SeatCount = 5, BodyType = BodyType.SUV, VehicleClass = VehicleClass.SUV },
+                new VehicleModel { Id = Guid.NewGuid(), Name = "Toyota Camry", DriveType = Domain.Domain.DriveType.FWD, SeatCount = 5, BodyType = BodyType.Sedan, VehicleClass = VehicleClass.Family },
+                new VehicleModel { Id = Guid.NewGuid(), Name = "BMW 5 Series", DriveType = Domain.Domain.DriveType.RWD, SeatCount = 5, BodyType = BodyType.Sedan, VehicleClass = VehicleClass.Business },
+                new VehicleModel { Id = Guid.NewGuid(), Name = "Mercedes E-Class", DriveType = Domain.Domain.DriveType.RWD, SeatCount = 5, BodyType = BodyType.Sedan, VehicleClass = VehicleClass.Luxury },
+                new VehicleModel { Id = Guid.NewGuid(), Name = "Honda Civic", DriveType = Domain.Domain.DriveType.FWD, SeatCount = 5, BodyType = BodyType.Hatchback, VehicleClass = VehicleClass.Compact },
+                new VehicleModel { Id = Guid.NewGuid(), Name = "Audi Q7", DriveType = Domain.Domain.DriveType.AWD, SeatCount = 7, BodyType = BodyType.SUV, VehicleClass = VehicleClass.SUV },
+                new VehicleModel { Id = Guid.NewGuid(), Name = "Ford Focus", DriveType = Domain.Domain.DriveType.FWD, SeatCount = 5, BodyType = BodyType.Hatchback, VehicleClass = VehicleClass.Compact },
+                new VehicleModel { Id = Guid.NewGuid(), Name = "Volkswagen Golf", DriveType = Domain.Domain.DriveType.FWD, SeatCount = 5, BodyType = BodyType.Hatchback, VehicleClass = VehicleClass.Compact },
+                new VehicleModel { Id = Guid.NewGuid(), Name = "Toyota RAV4", DriveType = Domain.Domain.DriveType.AWD, SeatCount = 5, BodyType = BodyType.SUV, VehicleClass = VehicleClass.SUV },
+                new VehicleModel { Id = Guid.NewGuid(), Name = "Chevrolet Cobalt", DriveType = Domain.Domain.DriveType.FWD, SeatCount = 5, BodyType = BodyType.Sedan, VehicleClass = VehicleClass.Compact },
+                new VehicleModel { Id = Guid.NewGuid(), Name = "BMW X5", DriveType = Domain.Domain.DriveType.AWD, SeatCount = 5, BodyType = BodyType.SUV, VehicleClass = VehicleClass.SUV },
             });
     }
 
@@ -221,7 +221,7 @@ public class CarRentalFixture
     }
 
     /// <summary>
-    /// Generates a random Russian license plate
+    /// Generates a random license plate
     /// </summary>
     /// <returns>License plate in format X123XX</returns>
     private static string GenerateLicensePlate()
