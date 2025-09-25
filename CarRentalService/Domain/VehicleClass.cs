@@ -1,4 +1,4 @@
-﻿namespace CarRentalService.Domain;
+﻿namespace CarRentalService.Domain.Domain;
 /// <summary>
 /// Vehicle class categories by size and purpose.
 /// </summary>

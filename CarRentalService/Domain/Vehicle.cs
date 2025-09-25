@@ -1,4 +1,4 @@
-﻿namespace CarRentalService.Domain;
+﻿namespace CarRentalService.Domain.Domain;
 /// <summary>
 /// Describes a specific vehicle
 /// </summary>

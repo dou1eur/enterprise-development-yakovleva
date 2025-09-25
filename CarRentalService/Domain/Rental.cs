@@ -1,4 +1,4 @@
-﻿namespace CarRentalService.Domain;
+﻿namespace CarRentalService.Domain.Domain;
 /// <summary>
 /// Represents a rental transaction of a vehicle
 /// </summary>
@@ -28,4 +28,9 @@ public class Rental
     /// Renter associated with this rental
     /// </summary>
     public required Renter Renter { get; set; }
+
+    /// <summary>
+    /// Total cost of the rental
+    /// </summary>
+    public decimal TotalCost => Car.Generation.PricePerHour * DurationHours;
 }

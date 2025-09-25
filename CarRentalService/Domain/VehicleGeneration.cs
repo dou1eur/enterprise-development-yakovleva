@@ -1,4 +1,4 @@
-﻿namespace CarRentalService.Domain;
+﻿namespace CarRentalService.Domain.Domain;
 /// <summary>
 /// Represents a specific generation of a vehicle model
 /// </summary>

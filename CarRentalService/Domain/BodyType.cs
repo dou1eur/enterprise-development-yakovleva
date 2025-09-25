@@ -1,4 +1,4 @@
-﻿namespace CarRentalService.Domain;
+﻿namespace CarRentalService.Domain.Domain;
 /// <summary>
 /// Body types for vehicles
 /// </summary>
