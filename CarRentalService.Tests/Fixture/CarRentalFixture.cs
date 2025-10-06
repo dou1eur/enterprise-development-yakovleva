@@ -32,11 +32,11 @@ public class CarRentalFixture
     /// </summary>
     public List<Rental> Rentals { get; } = [];
 
-    private VehicleModel? ChevroletCobaltModel { get; private set; }
-    private Vehicle? CobaltVehicle1 { get; private set; }
-    private Vehicle? CobaltVehicle2 { get; private set; }
-    private Renter? Renter1 { get; private set; }
-    private Renter? Renter2 { get; private set; }
+    private VehicleModel? ChevroletCobaltModel { get; set; }
+    private Vehicle? CobaltVehicle1 { get; set; }
+    private Vehicle? CobaltVehicle2 { get; set; }
+    private Renter? Renter1 { get; set; }
+    private Renter? Renter2 { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the fixture and populates with test data
