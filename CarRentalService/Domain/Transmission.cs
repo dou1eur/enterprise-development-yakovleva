@@ -17,15 +17,15 @@ public enum Transmission
     /// <summary>
     /// Continuously variable transmission
     /// </summary>
-    CVT,
+    Cvt,
 
     /// <summary>
     /// Automated manual transmission
     /// </summary>
-    AMT,
+    Amt,
 
     /// <summary>
     /// Dual-Clutch transmission
     /// </summary>
-    DCT
+    Dct
 }

@@ -17,7 +17,7 @@ public enum BodyType
     /// <summary>
     /// SUV - sport utility vehicle
     /// </summary>
-    SUV,
+    Suv,
 
     /// <summary>
     /// Coupe body type

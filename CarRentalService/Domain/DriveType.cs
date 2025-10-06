@@ -7,20 +7,20 @@ public enum DriveType
     /// <summary>
     /// Front-Wheel Drive
     /// </summary>
-    FWD,
+    Fwd,
 
     /// <summary>
     /// Rear-Wheel Drive
     /// </summary>
-    RWD,
+    Rwd,
 
     /// <summary>
     /// Four-Wheel Drive
     /// </summary>
-    FourWD,
+    FourWd,
    
     /// <summary>
     /// All-Wheel Drive
     /// </summary>
-    AWD
+    Awd
 }

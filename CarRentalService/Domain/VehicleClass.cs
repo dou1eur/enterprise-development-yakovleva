@@ -37,7 +37,7 @@ public enum VehicleClass
     /// <summary>
     /// SUV class – sport utility vehicles
     /// </summary>
-    SUV,
+    Suv,
 
     /// <summary>
     /// Minivan class

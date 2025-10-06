@@ -10,33 +10,33 @@ public class CarRentalFixture
     /// <summary>
     /// Collection of vehicle models
     /// </summary>
-    public List<VehicleModel> Models { get; } = new();
+    public List<VehicleModel> Models { get; } = [];
 
     /// <summary>
     /// Collection of vehicle generations
     /// </summary>
-    public List<VehicleGeneration> Generations { get; } = new();
+    public List<VehicleGeneration> Generations { get; } = [];
 
     /// <summary>
     /// Collection of specific vehicles
     /// </summary>
-    public List<Vehicle> Vehicles { get; } = new();
+    public List<Vehicle> Vehicles { get; } = [];
 
     /// <summary>
     /// Collection of renters
     /// </summary>
-    public List<Renter> Renters { get; } = new();
+    public List<Renter> Renters { get; } = [];
 
     /// <summary>
     /// Collection of rental transactions
     /// </summary>
-    public List<Rental> Rentals { get; } = new();
+    public List<Rental> Rentals { get; } = [];
 
-    public VehicleModel? ChevroletCobaltModel { get; private set; }
-    public Vehicle? CobaltVehicle1 { get; private set; }
-    public Vehicle? CobaltVehicle2 { get; private set; }
-    public Renter? Renter1 { get; private set; }
-    public Renter? Renter2 { get; private set; }
+    private VehicleModel? ChevroletCobaltModel { get; private set; }
+    private Vehicle? CobaltVehicle1 { get; private set; }
+    private Vehicle? CobaltVehicle2 { get; private set; }
+    private Renter? Renter1 { get; private set; }
+    private Renter? Renter2 { get; private set; }
 
     /// <summary>
     /// Initializes a new instance of the fixture and populates with test data
@@ -66,7 +66,7 @@ public class CarRentalFixture
         ChevroletCobaltModel = new VehicleModel
         {
             Name = "Chevrolet Cobalt",
-            DriveType = Domain.Domain.DriveType.FWD,
+            DriveType = Domain.Domain.DriveType.Fwd,
             SeatCount = 5,
             BodyType = BodyType.Sedan,
             VehicleClass = VehicleClass.Compact
@@ -75,7 +75,7 @@ public class CarRentalFixture
         var toyotaCamryModel = new VehicleModel
         {
             Name = "Toyota Camry",
-            DriveType = Domain.Domain.DriveType.FWD,
+            DriveType = Domain.Domain.DriveType.Fwd,
             SeatCount = 5,
             BodyType = BodyType.Sedan,
             VehicleClass = VehicleClass.Family
