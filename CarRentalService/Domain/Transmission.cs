@@ -1,4 +1,5 @@
-﻿namespace CarRentalService.Domain.Domain;
+﻿namespace CarRentalService.Domain;
+
 /// <summary>
 /// Type of vehicle transmission
 /// </summary>

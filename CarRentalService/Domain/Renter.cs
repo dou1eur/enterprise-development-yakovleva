@@ -1,4 +1,5 @@
-﻿namespace CarRentalService.Domain.Domain;
+﻿namespace CarRentalService.Domain;
+
 /// <summary>
 /// Represents a person who rents vehicles
 /// </summary>

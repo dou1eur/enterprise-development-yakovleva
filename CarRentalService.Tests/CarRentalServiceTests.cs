@@ -8,7 +8,6 @@ namespace CarRentalService.Tests;
 public class RentalServiceTests(CarRentalFixture _fixture) : IClassFixture<CarRentalFixture>
 {
     private const string ChevroletCobaltModelName = "Chevrolet Cobalt";
-    private const string ToyotaCamryModelName = "Toyota Camry";
     private const string AndreyPetrovFullName = "Андрей Петров";
     private const string EkaterinaNovikovaFullName = "Екатерина Новикова";
     private const string LicensePlateCobalt1 = "Н099ОР";

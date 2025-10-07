@@ -1,4 +1,4 @@
-﻿using CarRentalService.Domain.Domain;
+﻿using CarRentalService.Domain;
 
 namespace CarRentalService.Tests.Fixture;
 
@@ -66,7 +66,7 @@ public class CarRentalFixture
         ChevroletCobaltModel = new VehicleModel
         {
             Name = "Chevrolet Cobalt",
-            DriveType = Domain.Domain.DriveType.Fwd,
+            DriveType = Domain.DriveType.Fwd,
             SeatCount = 5,
             BodyType = BodyType.Sedan,
             VehicleClass = VehicleClass.Compact
@@ -75,7 +75,7 @@ public class CarRentalFixture
         var toyotaCamryModel = new VehicleModel
         {
             Name = "Toyota Camry",
-            DriveType = Domain.Domain.DriveType.Fwd,
+            DriveType = Domain.DriveType.Fwd,
             SeatCount = 5,
             BodyType = BodyType.Sedan,
             VehicleClass = VehicleClass.Family
