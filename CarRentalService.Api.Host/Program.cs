@@ -10,9 +10,14 @@ builder.Services.AddControllers();
 builder.Services.AddSingleton<IRentalRepository, RentalRepository>();
 builder.Services.AddSingleton<IVehicleRepository, VehicleRepository>();
 builder.Services.AddSingleton<IRenterRepository, RenterRepository>();
+builder.Services.AddSingleton<IVehicleGenerationRepository, VehicleGenerationRepository>();
+builder.Services.AddSingleton<IVehicleModelRepository, VehicleModelRepository>();
 
 builder.Services.AddScoped<IRentalService, RentalService>();
-
+builder.Services.AddScoped<IVehicleService, VehicleService>();
+builder.Services.AddScoped<IVehicleGenerationService, VehicleGenerationService>();
+builder.Services.AddScoped<IVehicleModelService, VehicleModelService>();
+builder.Services.AddScoped<IRenterService, RenterService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
