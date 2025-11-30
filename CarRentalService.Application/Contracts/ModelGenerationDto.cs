@@ -4,12 +4,12 @@ using System;
 namespace CarRentalService.Application.Contracts;
 
 /// <summary>
-/// Data transfer object for vehicle generation information
+/// Data transfer object for model generation information
 /// </summary>
-public class VehicleGenerationDto
+public class ModelGenerationDto
 {
     /// <summary>
-    /// Unique identifier for the vehicle generation
+    /// Unique identifier for the model generation
     /// </summary>
     public Guid Id { get; set; }
 
@@ -31,15 +31,10 @@ public class VehicleGenerationDto
     /// <summary>
     /// Rental price per hour
     /// </summary>
-    public decimal PricePerHour { get; set; }
+    public decimal RentalPricePerHour { get; set; }
 
     /// <summary>
     /// Identifier of the vehicle model
     /// </summary>
-    public Guid ModelId { get; set; }
-
-    /// <summary>
-    /// Additional information about the generation
-    /// </summary>
-    public string? GenerationInfo { get; set; }
+    public Guid VehicleModelId { get; set; }
 }

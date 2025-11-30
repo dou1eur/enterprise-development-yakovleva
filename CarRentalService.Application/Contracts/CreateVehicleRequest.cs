@@ -1,17 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace CarRentalService.Application.Contracts;
 
 /// <summary>
-/// Data transfer object for vehicle information
+/// Data transfer object for creating a vehicle
 /// </summary>
-public class VehicleDto
+public class CreateVehicleRequest
 {
-    /// <summary>
-    /// Unique identifier for the vehicle
-    /// </summary>
-    public Guid Id { get; set; }
-
     /// <summary>
     /// License plate number of the vehicle
     /// </summary>

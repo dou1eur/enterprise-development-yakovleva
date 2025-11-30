@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents a specific generation of a vehicle model
 /// </summary>
-public class VehicleGeneration
+public class ModelGeneration
 {
     /// <summary>
     /// Unique identifier for the generation
@@ -28,10 +28,10 @@ public class VehicleGeneration
     /// <summary>
     /// Rental price per hour
     /// </summary>
-    public required decimal PricePerHour { get; set; }
+    public required decimal RentalPricePerHour { get; set; }
 
     /// <summary>
-    /// Navigation property to the vehicle model
+    /// Identifier of the vehicle model
     /// </summary>
-    public required VehicleModel Model { get; set; }
+    public Guid VehicleModelId { get; set; }
 }

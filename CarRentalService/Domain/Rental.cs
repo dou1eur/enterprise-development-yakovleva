@@ -21,17 +21,18 @@ public class Rental
     public int DurationHours { get; set; }
 
     /// <summary>
-    /// Rented vehicle associated with this rental
+    /// Identifier of the rented vehicle
     /// </summary>
-    public required Vehicle Car { get; set; }
+    public Guid VehicleId { get; set; }
 
     /// <summary>
-    /// Renter associated with this rental
+    /// Identifier of the renter
     /// </summary>
-    public required Renter Renter { get; set; }
+    public Guid RenterId { get; set; }
 
     /// <summary>
     /// Total cost of the rental
     /// </summary>
-    public decimal TotalCost => Car.Generation.PricePerHour * DurationHours;
+    public decimal TotalCost { get; set; }
+
 }

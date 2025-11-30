@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace CarRentalService.Application.Contracts;
 
 /// <summary>
-/// Data transfer object for creating or updating a vehicle
+/// Data transfer object for updating a vehicle
 /// </summary>
-public class VehicleCreateUpdateDto
+public class UpdateVehicleRequest
 {
     /// <summary>
     /// License plate number of the vehicle
@@ -20,5 +24,5 @@ public class VehicleCreateUpdateDto
     /// <summary>
     /// Identifier of the vehicle generation
     /// </summary>
-    public Guid GenerationId { get; set; }
+    public Guid ModelGenerationId { get; set; }
 }

@@ -1,17 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace CarRentalService.Application.Contracts;
 
 /// <summary>
-/// Data transfer object for renter information
+/// Data transfer object for updating renter information
 /// </summary>
-public class RenterDto
+public class UpdateRenterRequest
 {
-    /// <summary>
-    /// Unique identifier for the renter
-    /// </summary>
-    public Guid Id { get; set; }
-
     /// <summary>
     /// Driver's license number of the renter
     /// </summary>

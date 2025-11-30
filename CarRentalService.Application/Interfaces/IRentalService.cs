@@ -1,33 +1,47 @@
 ﻿using CarRentalService.Application.Contracts;
 using System;
+using System.Collections.Generic;
 
 namespace CarRentalService.Application.Interfaces;
 
 /// <summary>
-/// Rental service interface for performing CRUD operations
-/// Provides CRUD operations for rental entities
+/// Service interface for managing rental operations
+/// Provides methods for basic CRUD operations on rentals
 /// </summary>
-public interface IRentalService : IApplicationCRUDService<RentalDto, RentalCreateUpdateDto, Guid>
+public interface IRentalService
 {
     /// <summary>
-    /// Retrieves all rentals for a specific renter
+    /// Creates a new rental record
     /// </summary>
-    /// <param name="renterId">The unique identifier of the renter</param>
-    /// <returns>List of rental data transfer objects for the specified renter</returns>
-    public System.Collections.Generic.List<RentalDto> GetByRenterId(Guid renterId);
+    /// <param name="request">Data transfer object containing rental creation details</param>
+    /// <returns>The created rental data transfer object</returns>
+    public Task<RentalDto> CreateAsync(CreateRentalRequest request);
 
     /// <summary>
-    /// Retrieves all rentals for a specific vehicle
+    /// Retrieves a rental by unique identifier
     /// </summary>
-    /// <param name="vehicleId">The unique identifier of the vehicle</param>
-    /// <returns>List of rental data transfer objects for the specified vehicle</returns>
-    public System.Collections.Generic.List<RentalDto> GetByVehicleId(Guid vehicleId);
+    /// <param name="id">The unique identifier of the rental</param>
+    /// <returns>The rental data transfer object if found; otherwise, null</returns>
+    public Task<RentalDto?> GetAsync(Guid id);
 
     /// <summary>
-    /// Calculates the rental cost for a vehicle and duration
+    /// Retrieves all rental records
     /// </summary>
-    /// <param name="vehicleId">The unique identifier of the vehicle</param>
-    /// <param name="durationHours">The rental duration in hours</param>
-    /// <returns>The calculated rental cost</returns>
-    public decimal CalculateRentalCost(Guid vehicleId, int durationHours);
+    /// <returns>List of all rental data transfer objects</returns>
+    public Task<List<RentalDto>> GetAllAsync();
+
+    /// <summary>
+    /// Updates an existing rental record
+    /// </summary>
+    /// <param name="id">The unique identifier of the rental to update</param>
+    /// <param name="request">Data transfer object containing updated rental details</param>
+    /// <returns>The updated rental data transfer object if successful; otherwise, null</returns>
+    public Task<RentalDto?> UpdateAsync(Guid id, UpdateRentalRequest request);
+
+    /// <summary>
+    /// Deletes a rental record by identifier
+    /// </summary>
+    /// <param name="id">The unique identifier of the rental to delete</param>
+    /// <returns>True if deletion was successful, otherwise false</returns>
+    public Task<bool> DeleteAsync(Guid id);
 }

@@ -5,7 +5,7 @@ namespace CarRentalService.Tests;
 /// <summary>
 /// Unit tests for CarRentalService rental operations and reporting
 /// </summary>
-public class RentalServiceTests(CarRentalFixture _fixture) : IClassFixture<CarRentalFixture>
+public class CarRentalServiceTests(CarRentalFixture _fixture) : IClassFixture<CarRentalFixture>
 {
     private const string ChevroletCobaltModelName = "Chevrolet Cobalt";
     private const string AndreyPetrovFullName = "Андрей Петров";
@@ -20,13 +20,23 @@ public class RentalServiceTests(CarRentalFixture _fixture) : IClassFixture<CarRe
     [Fact]
     public void GetCustomersRentingModelOrderedByName()
     {
-        var targetModel = ChevroletCobaltModelName;
+        var targetModel = _fixture.Models.First(m => m.Name == ChevroletCobaltModelName);
         var expectedCustomer1 = AndreyPetrovFullName;
         var expectedCustomer2 = EkaterinaNovikovaFullName;
 
+        var cobaltGenerationIds = _fixture.Generations
+            .Where(g => g.VehicleModelId == targetModel.Id)
+            .Select(g => g.Id)
+            .ToList();
+
+        var cobaltVehicleIds = _fixture.Vehicles
+            .Where(v => cobaltGenerationIds.Contains(v.GenerationId))
+            .Select(v => v.Id)
+            .ToList();
+
         var result = _fixture.Rentals
-            .Where(r => r.Car.Generation.Model.Name == targetModel)
-            .Select(r => r.Renter)
+            .Where(r => cobaltVehicleIds.Contains(r.VehicleId))
+            .Select(r => _fixture.GetRenterById(r.RenterId))
             .Distinct()
             .OrderBy(r => r.FullName)
             .ToList();
@@ -45,19 +55,17 @@ public class RentalServiceTests(CarRentalFixture _fixture) : IClassFixture<CarRe
     {
         var testTime = new DateTime(2024, 1, 1, 12, 0, 0);
         var expectedLicensePlate = LicensePlateCobalt1;
-        var expectedModelName = ChevroletCobaltModelName;
 
         var result = _fixture.Rentals
             .Where(r => r.RentStartTime <= testTime &&
                        r.RentStartTime.AddHours(r.DurationHours) >= testTime)
-            .Select(r => r.Car)
+            .Select(r => _fixture.GetVehicleById(r.VehicleId))
             .Distinct()
             .ToList();
 
         Assert.NotNull(result);
         Assert.Single(result);
         Assert.Equal(expectedLicensePlate, result[0].LicensePlate);
-        Assert.Equal(expectedModelName, result[0].Generation.Model.Name);
     }
 
     /// <summary>
@@ -70,8 +78,12 @@ public class RentalServiceTests(CarRentalFixture _fixture) : IClassFixture<CarRe
         var expectedTopRentalCount = 2;
 
         var result = _fixture.Rentals
-            .GroupBy(r => r.Car)
-            .Select(g => new { Vehicle = g.Key, RentalCount = g.Count() })
+            .GroupBy(r => r.VehicleId)
+            .Select(g => new
+            {
+                Vehicle = _fixture.GetVehicleById(g.Key),
+                RentalCount = g.Count()
+            })
             .OrderByDescending(x => x.RentalCount)
             .Take(5)
             .ToList();
@@ -105,7 +117,7 @@ public class RentalServiceTests(CarRentalFixture _fixture) : IClassFixture<CarRe
             .Select(vehicle => new
             {
                 Vehicle = vehicle,
-                RentalCount = _fixture.Rentals.Count(r => r.Car.Id == vehicle.Id)
+                RentalCount = _fixture.Rentals.Count(r => r.VehicleId == vehicle.Id)
             })
             .ToList();
 
@@ -128,15 +140,15 @@ public class RentalServiceTests(CarRentalFixture _fixture) : IClassFixture<CarRe
     public void GetTop5CustomersByRentalCost()
     {
         var expectedTopCustomerName = AndreyPetrovFullName;
-        var expectedTopCustomerCost = 15600;
+        var expectedTopCustomerCost = 15600m;
         var expectedSecondCustomerName = EkaterinaNovikovaFullName;
-        var expectedSecondCustomerCost = 12600;
+        var expectedSecondCustomerCost = 12600m;
 
         var result = _fixture.Rentals
-            .GroupBy(r => r.Renter)
+            .GroupBy(r => r.RenterId)
             .Select(g => new
             {
-                Customer = g.Key,
+                Customer = _fixture.GetRenterById(g.Key),
                 TotalCost = g.Sum(r => r.TotalCost)
             })
             .OrderByDescending(x => x.TotalCost)

@@ -24,7 +24,7 @@ public class RentalDto
     /// <summary>
     /// Duration of the rental in hours
     /// </summary>
-    public int DurationHours { get; set; }
+    public int RentalDurationHours { get; set; }
 
     /// <summary>
     /// Total cost of the rental
@@ -34,20 +34,10 @@ public class RentalDto
     /// <summary>
     /// Identifier of the rented vehicle
     /// </summary>
-    public Guid CarId { get; set; }
+    public Guid VehicleId { get; set; }
 
     /// <summary>
-    /// Identifier of the renter
+    /// Identifier of the customer
     /// </summary>
-    public Guid RenterId { get; set; }
-
-    /// <summary>
-    /// Additional information about the rented vehicle
-    /// </summary>
-    public string? CarInfo { get; set; }
-
-    /// <summary>
-    /// Additional information about the renter
-    /// </summary>
-    public string? RenterInfo { get; set; }
+    public Guid CustomerId { get; set; }
 }

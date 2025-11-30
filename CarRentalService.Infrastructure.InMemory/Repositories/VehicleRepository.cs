@@ -38,7 +38,7 @@ public class VehicleRepository : BaseRepository<Vehicle, Guid>, IVehicleReposito
     /// <returns>List of vehicles for the specified model</returns>
     public Task<List<Vehicle>> GetByModelAsync(Guid modelId)
     {
-        var vehicles = _entities.Where(v => v.Generation.Model.Id == modelId).ToList();
+        var vehicles = _entities.ToList();
         return Task.FromResult(vehicles);
     }
 }

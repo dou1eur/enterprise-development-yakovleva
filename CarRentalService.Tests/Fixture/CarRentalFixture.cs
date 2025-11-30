@@ -10,31 +10,35 @@ public class CarRentalFixture
     /// <summary>
     /// Collection of vehicle models
     /// </summary>
-    public List<VehicleModel> Models { get; } = [];
+    public List<VehicleModel> Models { get; } = new();
 
     /// <summary>
     /// Collection of vehicle generations
     /// </summary>
-    public List<VehicleGeneration> Generations { get; } = [];
+    public List<ModelGeneration> Generations { get; } = new();
 
     /// <summary>
     /// Collection of specific vehicles
     /// </summary>
-    public List<Vehicle> Vehicles { get; } = [];
+    public List<Vehicle> Vehicles { get; } = new();
 
     /// <summary>
     /// Collection of renters
     /// </summary>
-    public List<Renter> Renters { get; } = [];
+    public List<Renter> Renters { get; } = new();
 
     /// <summary>
     /// Collection of rental transactions
     /// </summary>
-    public List<Rental> Rentals { get; } = [];
+    public List<Rental> Rentals { get; } = new();
 
     private VehicleModel? ChevroletCobaltModel { get; set; }
+    private VehicleModel? ToyotaCamryModel { get; set; }
+    private ModelGeneration? CobaltGeneration { get; set; }
+    private ModelGeneration? CamryGeneration { get; set; }
     private Vehicle? CobaltVehicle1 { get; set; }
     private Vehicle? CobaltVehicle2 { get; set; }
+    private Vehicle? CamryVehicle { get; set; }
     private Renter? Renter1 { get; set; }
     private Renter? Renter2 { get; set; }
 
@@ -65,6 +69,7 @@ public class CarRentalFixture
     {
         ChevroletCobaltModel = new VehicleModel
         {
+            Id = Guid.NewGuid(),
             Name = "Chevrolet Cobalt",
             DriveType = Domain.DriveType.Fwd,
             SeatCount = 5,
@@ -72,8 +77,9 @@ public class CarRentalFixture
             VehicleClass = VehicleClass.Compact
         };
 
-        var toyotaCamryModel = new VehicleModel
+        ToyotaCamryModel = new VehicleModel
         {
+            Id = Guid.NewGuid(),
             Name = "Toyota Camry",
             DriveType = Domain.DriveType.Fwd,
             SeatCount = 5,
@@ -82,7 +88,7 @@ public class CarRentalFixture
         };
 
         Models.Add(ChevroletCobaltModel);
-        Models.Add(toyotaCamryModel);
+        Models.Add(ToyotaCamryModel);
     }
 
     /// <summary>
@@ -90,26 +96,28 @@ public class CarRentalFixture
     /// </summary>
     private void CreateGenerations()
     {
-        var cobaltGeneration = new VehicleGeneration
+        CobaltGeneration = new ModelGeneration
         {
+            Id = Guid.NewGuid(),
             Year = 2016,
             EngineVolume = 1.8,
             Transmission = Transmission.Automatic,
-            PricePerHour = 1200m,
-            Model = ChevroletCobaltModel!
+            RentalPricePerHour = 1200m,
+            VehicleModelId = ChevroletCobaltModel!.Id
         };
 
-        var camryGeneration = new VehicleGeneration
+        CamryGeneration = new ModelGeneration
         {
+            Id = Guid.NewGuid(),
             Year = 2023,
             EngineVolume = 2.0,
             Transmission = Transmission.Automatic,
-            PricePerHour = 1500m,
-            Model = Models[1]
+            RentalPricePerHour = 1500m,
+            VehicleModelId = ToyotaCamryModel!.Id
         };
 
-        Generations.Add(cobaltGeneration);
-        Generations.Add(camryGeneration);
+        Generations.Add(CobaltGeneration);
+        Generations.Add(CamryGeneration);
     }
 
     /// <summary>
@@ -117,33 +125,33 @@ public class CarRentalFixture
     /// </summary>
     private void CreateVehicles()
     {
-        var cobaltGeneration = Generations[0];
-        var camryGeneration = Generations[1];
-
         CobaltVehicle1 = new Vehicle
         {
+            Id = Guid.NewGuid(),
             LicensePlate = "Н099ОР",
             Color = "Black",
-            Generation = cobaltGeneration
+            GenerationId = CobaltGeneration!.Id
         };
 
         CobaltVehicle2 = new Vehicle
         {
+            Id = Guid.NewGuid(),
             LicensePlate = "А071ВР",
             Color = "White",
-            Generation = cobaltGeneration
+            GenerationId = CobaltGeneration.Id
         };
 
-        var camryVehicle = new Vehicle
+        CamryVehicle = new Vehicle
         {
+            Id = Guid.NewGuid(),
             LicensePlate = "Т801УХ",
             Color = "Silver",
-            Generation = camryGeneration
+            GenerationId = CamryGeneration!.Id
         };
 
         Vehicles.Add(CobaltVehicle1);
         Vehicles.Add(CobaltVehicle2);
-        Vehicles.Add(camryVehicle);
+        Vehicles.Add(CamryVehicle);
     }
 
     /// <summary>
@@ -153,6 +161,7 @@ public class CarRentalFixture
     {
         Renter1 = new Renter
         {
+            Id = Guid.NewGuid(),
             LicenseNumber = "1234123412",
             FullName = "Андрей Петров",
             DateOfBirth = new DateTime(1990, 1, 1)
@@ -160,6 +169,7 @@ public class CarRentalFixture
 
         Renter2 = new Renter
         {
+            Id = Guid.NewGuid(),
             LicenseNumber = "3456345634",
             FullName = "Екатерина Новикова",
             DateOfBirth = new DateTime(1985, 1, 1)
@@ -176,34 +186,46 @@ public class CarRentalFixture
     {
         Rentals.Add(new Rental
         {
+            Id = Guid.NewGuid(),
             RentStartTime = new DateTime(2024, 1, 1, 10, 0, 0),
             DurationHours = 5,
-            Car = CobaltVehicle1!,
-            Renter = Renter1!
+            VehicleId = CobaltVehicle1!.Id,
+            RenterId = Renter1!.Id,
+            TotalCost = 1200m * 5
         });
 
         Rentals.Add(new Rental
         {
+            Id = Guid.NewGuid(),
             RentStartTime = new DateTime(2024, 1, 2, 14, 0, 0),
             DurationHours = 3,
-            Car = CobaltVehicle1!,
-            Renter = Renter2!
+            VehicleId = CobaltVehicle1!.Id,
+            RenterId = Renter2!.Id,
+            TotalCost = 1200m * 3
         });
 
         Rentals.Add(new Rental
         {
+            Id = Guid.NewGuid(),
             RentStartTime = new DateTime(2024, 1, 3, 9, 0, 0),
             DurationHours = 8,
-            Car = CobaltVehicle2!,
-            Renter = Renter1!
+            VehicleId = CobaltVehicle2!.Id,
+            RenterId = Renter1!.Id,
+            TotalCost = 1200m * 8
         });
 
         Rentals.Add(new Rental
         {
+            Id = Guid.NewGuid(),
             RentStartTime = new DateTime(2024, 1, 4, 11, 0, 0),
             DurationHours = 6,
-            Car = Vehicles[2],
-            Renter = Renter2!
+            VehicleId = CamryVehicle!.Id,
+            RenterId = Renter2!.Id,
+            TotalCost = 1500m * 6
         });
     }
+    public VehicleModel GetVehicleModelById(Guid id) => Models.First(m => m.Id == id);
+    public ModelGeneration GetModelGenerationById(Guid id) => Generations.First(g => g.Id == id);
+    public Vehicle GetVehicleById(Guid id) => Vehicles.First(v => v.Id == id);
+    public Renter GetRenterById(Guid id) => Renters.First(r => r.Id == id);
 }

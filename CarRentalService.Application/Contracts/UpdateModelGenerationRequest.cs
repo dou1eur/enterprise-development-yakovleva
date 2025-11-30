@@ -1,12 +1,16 @@
 ﻿using CarRentalService.Domain;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace CarRentalService.Application.Contracts;
 
 /// <summary>
-/// Data transfer object for creating or updating a vehicle generation
+/// Data transfer object for updating a model generation
 /// </summary>
-public class VehicleGenerationCreateUpdateDto
+public class UpdateModelGenerationRequest
 {
     /// <summary>
     /// Production year of this generation
@@ -26,10 +30,10 @@ public class VehicleGenerationCreateUpdateDto
     /// <summary>
     /// Rental price per hour
     /// </summary>
-    public decimal PricePerHour { get; set; }
+    public decimal RentalPricePerHour { get; set; }
 
     /// <summary>
     /// Identifier of the vehicle model
     /// </summary>
-    public Guid ModelId { get; set; }
+    public Guid VehicleModelId { get; set; }
 }

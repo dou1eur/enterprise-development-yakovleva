@@ -7,11 +7,11 @@ namespace CarRentalService.Api.Host.Controllers;
 
 /// <summary>
 /// API controller for managing rental operations
-/// Provides endpoints for rental CRUD operations and analytical queries
+/// Provides endpoints for rental CRUD operations
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
-public class RentalsController : CrudControllerBase<RentalDto, RentalCreateUpdateDto, Guid>
+public class RentalsController : CrudControllerBase<RentalDto, CreateRentalRequest, UpdateRentalRequest, Guid>
 {
     private readonly IRentalService _rentalService;
 
@@ -38,50 +38,4 @@ public class RentalsController : CrudControllerBase<RentalDto, RentalCreateUpdat
     /// </summary>
     /// <returns>The rental service instance</returns>
     protected override dynamic GetService() => _rentalService;
-
-    /// <summary>
-    /// Retrieves all rentals for a specific renter
-    /// </summary>
-    /// <param name="renterId">The unique identifier of the renter</param>
-    /// <returns>List of rentals for the specified renter</returns>
-    [HttpGet("renter/{renterId}")]
-    [ProducesResponseType(200)]
-    [ProducesResponseType(500)]
-    public ActionResult<List<RentalDto>> GetByRenterId(Guid renterId)
-        => ExecuteWithLogging(nameof(GetByRenterId), () => Ok(_rentalService.GetByRenterId(renterId)));
-
-    /// <summary>
-    /// Retrieves all rentals for a specific vehicle
-    /// </summary>
-    /// <param name="vehicleId">The unique identifier of the vehicle</param>
-    /// <returns>List of rentals for the specified vehicle</returns>
-    [HttpGet("vehicle/{vehicleId}")]
-    [ProducesResponseType(200)]
-    [ProducesResponseType(500)]
-    public ActionResult<List<RentalDto>> GetByVehicleId(Guid vehicleId)
-        => ExecuteWithLogging(nameof(GetByVehicleId), () => Ok(_rentalService.GetByVehicleId(vehicleId)));
-
-    /// <summary>
-    /// Calculates the rental cost for a vehicle and duration
-    /// </summary>
-    /// <param name="vehicleId">The unique identifier of the vehicle</param>
-    /// <param name="durationHours">The rental duration in hours</param>
-    /// <returns>The calculated rental cost</returns>
-    [HttpGet("calculate-cost/{vehicleId}/{durationHours}")]
-    [ProducesResponseType(200)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(500)]
-    public ActionResult<decimal> CalculateRentalCost(Guid vehicleId, int durationHours)
-        => ExecuteWithLogging(nameof(CalculateRentalCost), () =>
-        {
-            try
-            {
-                var result = _rentalService.CalculateRentalCost(vehicleId, durationHours);
-                return Ok(result);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        });
 }

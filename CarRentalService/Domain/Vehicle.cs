@@ -21,7 +21,7 @@ public class Vehicle
     public required string Color { get; set; }
 
     /// <summary>
-    /// Navigation property to the vehicle generation
+    /// Identifier of the vehicle generation
     /// </summary>
-    public required VehicleGeneration Generation { get; set; }
+    public Guid GenerationId { get; set; }
 }

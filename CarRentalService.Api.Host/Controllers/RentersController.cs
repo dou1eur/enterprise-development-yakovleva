@@ -11,7 +11,7 @@ namespace CarRentalService.Api.Host.Controllers;
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
-public class RentersController : CrudControllerBase<RenterDto, RenterCreateUpdateDto, Guid>
+public class RentersController : CrudControllerBase<RenterDto, CreateRenterRequest, UpdateRenterRequest, Guid>
 {
     private readonly IRenterService _renterService;
 
@@ -38,22 +38,4 @@ public class RentersController : CrudControllerBase<RenterDto, RenterCreateUpdat
     /// </summary>
     /// <returns>The renter service instance</returns>
     protected override dynamic GetService() => _renterService;
-
-    /// <summary>
-    /// Retrieves a renter by driver's license number
-    /// </summary>
-    /// <param name="licenseNumber">The driver's license number</param>
-    /// <returns>The renter if found</returns>
-    [HttpGet("license/{licenseNumber}")]
-    [ProducesResponseType(200)]
-    [ProducesResponseType(404)]
-    [ProducesResponseType(500)]
-    public ActionResult<RenterDto> GetByLicenseNumber(string licenseNumber)
-        => ExecuteWithLogging(nameof(GetByLicenseNumber), () =>
-        {
-            var renter = _renterService.GetByLicenseNumber(licenseNumber);
-            if (renter == null)
-                return NotFound($"Renter with license number {licenseNumber} not found");
-            return Ok(renter);
-        });
 }

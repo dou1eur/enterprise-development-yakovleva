@@ -7,17 +7,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddSingleton<IRentalRepository, RentalRepository>();
-builder.Services.AddSingleton<IVehicleRepository, VehicleRepository>();
 builder.Services.AddSingleton<IRenterRepository, RenterRepository>();
-builder.Services.AddSingleton<IVehicleGenerationRepository, VehicleGenerationRepository>();
+builder.Services.AddSingleton<IVehicleRepository, VehicleRepository>();
 builder.Services.AddSingleton<IVehicleModelRepository, VehicleModelRepository>();
+builder.Services.AddSingleton<IModelGenerationRepository, ModelGenerationRepository>();
+builder.Services.AddSingleton<IRentalRepository, RentalRepository>();
 
-builder.Services.AddScoped<IRentalService, RentalService>();
-builder.Services.AddScoped<IVehicleService, VehicleService>();
-builder.Services.AddScoped<IVehicleGenerationService, VehicleGenerationService>();
-builder.Services.AddScoped<IVehicleModelService, VehicleModelService>();
 builder.Services.AddScoped<IRenterService, RenterService>();
+builder.Services.AddScoped<IVehicleService, VehicleService>();
+builder.Services.AddScoped<IVehicleModelService, VehicleModelService>();
+builder.Services.AddScoped<IModelGenerationService, ModelGenerationService>();
+builder.Services.AddScoped<IRentalService, RentalService>();
+builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

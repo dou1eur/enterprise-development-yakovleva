@@ -26,7 +26,7 @@ public class RentalRepository : BaseRepository<Rental, Guid>, IRentalRepository
     /// <returns>List of rentals for the specified renter</returns>
     public Task<List<Rental>> GetByRenterIdAsync(Guid renterId)
     {
-        var rentals = _entities.Where(r => r.Renter.Id == renterId).ToList();
+        var rentals = _entities.Where(r => r.RenterId == renterId).ToList();
         return Task.FromResult(rentals);
     }
 
@@ -37,7 +37,7 @@ public class RentalRepository : BaseRepository<Rental, Guid>, IRentalRepository
     /// <returns>List of rentals for the specified vehicle</returns>
     public Task<List<Rental>> GetByVehicleIdAsync(Guid vehicleId)
     {
-        var rentals = _entities.Where(r => r.Car.Id == vehicleId).ToList();
+        var rentals = _entities.Where(r => r.VehicleId == vehicleId).ToList();
         return Task.FromResult(rentals);
     }
 }

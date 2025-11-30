@@ -1,6 +1,7 @@
 ﻿using CarRentalService.Application.Contracts;
 using CarRentalService.Application.Interfaces;
 using CarRentalService.Application.Interfaces.Repositories;
+using CarRentalService.Application.Mappings;
 using CarRentalService.Domain;
 using System;
 using System.Collections.Generic;
@@ -9,188 +10,125 @@ using System.Linq;
 namespace CarRentalService.Application.Services;
 
 /// <summary>
-/// Service implementation for managing rental operations
-/// Handles business logic for rental CRUD operations and cost calculations
+/// Service for managing rentals in the car rental system
+/// Handles rental operations including validation and cost calculation
 /// </summary>
 public class RentalService : IRentalService
 {
     private readonly IRentalRepository _rentalRepository;
-    private readonly IVehicleRepository _vehicleRepository;
     private readonly IRenterRepository _renterRepository;
+    private readonly IVehicleRepository _vehicleRepository;
+    private readonly IModelGenerationRepository _modelGenerationRepository;
 
     /// <summary>
-    /// Initializes a new instance of the RentalService class
+    /// Initializes a new instance of RentalService
     /// </summary>
     /// <param name="rentalRepository">The rental repository</param>
-    /// <param name="vehicleRepository">The vehicle repository</param>
     /// <param name="renterRepository">The renter repository</param>
+    /// <param name="vehicleRepository">The vehicle repository</param>
+    /// <param name="modelGenerationRepository">The model generation repository</param>
     public RentalService(
         IRentalRepository rentalRepository,
+        IRenterRepository renterRepository,
         IVehicleRepository vehicleRepository,
-        IRenterRepository renterRepository)
+        IModelGenerationRepository modelGenerationRepository)
     {
         _rentalRepository = rentalRepository;
-        _vehicleRepository = vehicleRepository;
         _renterRepository = renterRepository;
+        _vehicleRepository = vehicleRepository;
+        _modelGenerationRepository = modelGenerationRepository;
     }
 
     /// <summary>
-    /// Creates a new rental record after validating vehicle and renter existence
+    /// Creates a new rental record with validation and cost calculation
     /// </summary>
-    /// <param name="dto">Data transfer object containing rental creation details</param>
+    /// <param name="request">Data transfer object containing rental creation details</param>
     /// <returns>The created rental data transfer object</returns>
-    /// <exception cref="ArgumentException">Thrown when vehicle or renter is not found</exception>
-    public RentalDto Create(RentalCreateUpdateDto dto)
+    /// <exception cref="ArgumentException">Thrown when renter, vehicle, or model generation does not exist</exception>
+    public async Task<RentalDto> CreateAsync(CreateRentalRequest request)
     {
-        var vehicle = _vehicleRepository.GetByIdAsync(dto.CarId).Result;
-        if (vehicle == null)
-            throw new ArgumentException($"Vehicle with ID {dto.CarId} not found");
-
-        var renter = _renterRepository.GetByIdAsync(dto.RenterId).Result;
+        var renter = await _renterRepository.GetByIdAsync(request.CustomerId);
         if (renter == null)
-            throw new ArgumentException($"Renter with ID {dto.RenterId} not found");
+            throw new ArgumentException($"Renter with ID {request.CustomerId} does not exist");
 
-        var rental = new Rental
-        {
-            RentStartTime = dto.RentStartTime,
-            DurationHours = dto.DurationHours,
-            Car = vehicle,
-            Renter = renter
-        };
+        var vehicle = await _vehicleRepository.GetByIdAsync(request.VehicleId);
+        if (vehicle == null)
+            throw new ArgumentException($"Vehicle with ID {request.VehicleId} does not exist");
 
-        _rentalRepository.AddAsync(rental);
+        var modelGeneration = await _modelGenerationRepository.GetByIdAsync(vehicle.GenerationId);
+        if (modelGeneration == null)
+            throw new ArgumentException($"Model generation for vehicle {request.VehicleId} does not exist");
 
-        return MapToDto(rental);
+        var rental = request.ToDomain();
+        rental.TotalCost = modelGeneration.RentalPricePerHour * rental.DurationHours;
+
+        var createdRental = await _rentalRepository.AddAsync(rental);
+        return createdRental.ToDto();
     }
 
     /// <summary>
-    /// Retrieves a rental by its unique identifier
+    /// Retrieves a rental by unique identifier
     /// </summary>
     /// <param name="id">The unique identifier of the rental</param>
-    /// <returns>The rental data transfer object</returns>
-    /// <exception cref="KeyNotFoundException">Thrown when rental with specified ID is not found</exception>
-    public RentalDto Get(Guid id)
+    /// <returns>The rental data transfer object if found; otherwise, null</returns>
+    public async Task<RentalDto?> GetAsync(Guid id)
     {
-        var rental = _rentalRepository.GetByIdAsync(id).Result;
-        if (rental == null)
-            throw new KeyNotFoundException($"Rental with ID {id} not found");
-
-        return MapToDto(rental);
+        var rental = await _rentalRepository.GetByIdAsync(id);
+        return rental?.ToDto();
     }
 
     /// <summary>
     /// Retrieves all rental records
     /// </summary>
     /// <returns>List of all rental data transfer objects</returns>
-    public List<RentalDto> GetAll()
+    public async Task<List<RentalDto>> GetAllAsync()
     {
-        var rentals = _rentalRepository.GetAllAsync().Result;
-        return rentals.Select(MapToDto).ToList();
+        var rentals = await _rentalRepository.GetAllAsync();
+        return rentals.ConvertAll(r => r.ToDto());
     }
 
     /// <summary>
-    /// Updates an existing rental record
+    /// Updates an existing rental record with validation and cost recalculation
     /// </summary>
-    /// <param name="dto">Data transfer object containing updated rental details</param>
     /// <param name="id">The unique identifier of the rental to update</param>
-    /// <returns>The updated rental data transfer object</returns>
-    /// <exception cref="KeyNotFoundException">Thrown when rental with specified ID is not found</exception>
-    /// <exception cref="ArgumentException">Thrown when vehicle or renter is not found</exception>
-    public RentalDto Update(RentalCreateUpdateDto dto, Guid id)
+    /// <param name="request">Data transfer object containing updated rental details</param>
+    /// <returns>The updated rental data transfer object if successful; otherwise, null</returns>
+    /// <exception cref="ArgumentException">Thrown when renter, vehicle, or model generation does not exist</exception>
+    public async Task<RentalDto?> UpdateAsync(Guid id, UpdateRentalRequest request)
     {
-        var existingRental = _rentalRepository.GetByIdAsync(id).Result;
+        var existingRental = await _rentalRepository.GetByIdAsync(id);
         if (existingRental == null)
-            throw new KeyNotFoundException($"Rental with ID {id} not found");
+            return null;
 
-        if (existingRental.Car.Id != dto.CarId)
-        {
-            var vehicle = _vehicleRepository.GetByIdAsync(dto.CarId).Result;
-            if (vehicle == null)
-                throw new ArgumentException($"Vehicle with ID {dto.CarId} not found");
-            existingRental.Car = vehicle;
-        }
+        var renter = await _renterRepository.GetByIdAsync(request.CustomerId);
+        if (renter == null)
+            throw new ArgumentException($"Renter with ID {request.CustomerId} does not exist");
 
-        if (existingRental.Renter.Id != dto.RenterId)
-        {
-            var renter = _renterRepository.GetByIdAsync(dto.RenterId).Result;
-            if (renter == null)
-                throw new ArgumentException($"Renter with ID {dto.RenterId} not found");
-            existingRental.Renter = renter;
-        }
+        var vehicle = await _vehicleRepository.GetByIdAsync(request.VehicleId);
+        if (vehicle == null)
+            throw new ArgumentException($"Vehicle with ID {request.VehicleId} does not exist");
 
-        existingRental.RentStartTime = dto.RentStartTime;
-        existingRental.DurationHours = dto.DurationHours;
+        var modelGeneration = await _modelGenerationRepository.GetByIdAsync(vehicle.GenerationId);
+        if (modelGeneration == null)
+            throw new ArgumentException($"Model generation for vehicle {request.VehicleId} does not exist");
 
-        _rentalRepository.UpdateAsync(existingRental);
+        existingRental.RentStartTime = request.RentStartTime;
+        existingRental.DurationHours = request.RentalDurationHours;
+        existingRental.VehicleId = request.VehicleId;
+        existingRental.RenterId = request.CustomerId;
+        existingRental.TotalCost = modelGeneration.RentalPricePerHour * existingRental.DurationHours;
 
-        return MapToDto(existingRental);
+        var updatedRental = await _rentalRepository.UpdateAsync(existingRental);
+        return updatedRental.ToDto();
     }
 
     /// <summary>
-    /// Deletes a rental record by its identifier
+    /// Deletes a rental record by identifier
     /// </summary>
     /// <param name="id">The unique identifier of the rental to delete</param>
     /// <returns>True if deletion was successful, otherwise false</returns>
-    public bool Delete(Guid id)
+    public async Task<bool> DeleteAsync(Guid id)
     {
-        return _rentalRepository.DeleteAsync(id).Result;
-    }
-
-    /// <summary>
-    /// Retrieves all rentals for a specific renter
-    /// </summary>
-    /// <param name="renterId">The unique identifier of the renter</param>
-    /// <returns>List of rental data transfer objects for the specified renter</returns>
-    public List<RentalDto> GetByRenterId(Guid renterId)
-    {
-        var rentals = _rentalRepository.GetByRenterIdAsync(renterId).Result;
-        return rentals.Select(MapToDto).ToList();
-    }
-
-    /// <summary>
-    /// Retrieves all rentals for a specific vehicle
-    /// </summary>
-    /// <param name="vehicleId">The unique identifier of the vehicle</param>
-    /// <returns>List of rental data transfer objects for the specified vehicle</returns>
-    public List<RentalDto> GetByVehicleId(Guid vehicleId)
-    {
-        var rentals = _rentalRepository.GetByVehicleIdAsync(vehicleId).Result;
-        return rentals.Select(MapToDto).ToList();
-    }
-
-    /// <summary>
-    /// Calculates the rental cost for a vehicle and duration
-    /// </summary>
-    /// <param name="vehicleId">The unique identifier of the vehicle</param>
-    /// <param name="durationHours">The rental duration in hours</param>
-    /// <returns>The calculated rental cost</returns>
-    /// <exception cref="ArgumentException">Thrown when vehicle is not found</exception>
-    public decimal CalculateRentalCost(Guid vehicleId, int durationHours)
-    {
-        var vehicle = _vehicleRepository.GetByIdAsync(vehicleId).Result;
-        if (vehicle == null)
-            throw new ArgumentException($"Vehicle with ID {vehicleId} not found");
-
-        return vehicle.Generation.PricePerHour * durationHours;
-    }
-
-    /// <summary>
-    /// Maps a Rental domain entity to a RentalDto data transfer object
-    /// </summary>
-    /// <param name="rental">The rental domain entity</param>
-    /// <returns>The mapped rental data transfer object</returns>
-    private static RentalDto MapToDto(Rental rental)
-    {
-        return new RentalDto
-        {
-            Id = rental.Id,
-            RentStartTime = rental.RentStartTime,
-            DurationHours = rental.DurationHours,
-            TotalCost = rental.TotalCost,
-            CarId = rental.Car.Id,
-            RenterId = rental.Renter.Id,
-            CarInfo = $"{rental.Car.Generation.Model.Name} ({rental.Car.Color})",
-            RenterInfo = rental.Renter.FullName
-        };
+        return await _rentalRepository.DeleteAsync(id);
     }
 }

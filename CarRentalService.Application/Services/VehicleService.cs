@@ -1,6 +1,7 @@
 ﻿using CarRentalService.Application.Contracts;
 using CarRentalService.Application.Interfaces;
 using CarRentalService.Application.Interfaces.Repositories;
+using CarRentalService.Application.Mappings;
 using CarRentalService.Domain;
 using System;
 using System.Collections.Generic;
@@ -9,152 +10,97 @@ using System.Linq;
 namespace CarRentalService.Application.Services;
 
 /// <summary>
-/// Service implementation for managing vehicle operations
-/// Handles business logic for vehicle CRUD operations
+/// Service for managing vehicles in the car rental system
+/// Handles vehicle operations with validation of related entities
 /// </summary>
 public class VehicleService : IVehicleService
 {
     private readonly IVehicleRepository _vehicleRepository;
-    private readonly IVehicleGenerationRepository _generationRepository;
+    private readonly IModelGenerationRepository _modelGenerationRepository;
 
     /// <summary>
-    /// Initializes a new instance of the VehicleService class
+    /// Initializes a new instance of VehicleService
     /// </summary>
-    /// <param name="vehicleRepository">The vehicle repository</param>
-    /// <param name="generationRepository">The vehicle generation repository</param>
+    /// <param name="vehicleRepository">The vehicle repository for data access</param>
+    /// <param name="modelGenerationRepository">The model generation repository for validation</param>
     public VehicleService(
         IVehicleRepository vehicleRepository,
-        IVehicleGenerationRepository generationRepository)
+        IModelGenerationRepository modelGenerationRepository)
     {
         _vehicleRepository = vehicleRepository;
-        _generationRepository = generationRepository;
+        _modelGenerationRepository = modelGenerationRepository;
     }
 
     /// <summary>
-    /// Creates a new vehicle record
+    /// Creates a new vehicle record in the system
     /// </summary>
-    /// <param name="dto">Data transfer object containing vehicle creation details</param>
+    /// <param name="request">Data transfer object containing vehicle creation details</param>
     /// <returns>The created vehicle data transfer object</returns>
-    /// <exception cref="ArgumentException">Thrown when vehicle generation is not found</exception>
-    public VehicleDto Create(VehicleCreateUpdateDto dto)
+    /// <exception cref="ArgumentException">Thrown when the specified model generation does not exist</exception>
+    public async Task<VehicleDto> CreateAsync(CreateVehicleRequest request)
     {
-        var generation = _generationRepository.GetByIdAsync(dto.GenerationId).Result;
-        if (generation == null)
-            throw new ArgumentException($"Vehicle generation with ID {dto.GenerationId} not found");
+        var modelGeneration = await _modelGenerationRepository.GetByIdAsync(request.ModelGenerationId);
+        if (modelGeneration == null)
+            throw new ArgumentException($"Model generation with ID {request.ModelGenerationId} does not exist");
 
-        var vehicle = new Vehicle
-        {
-            LicensePlate = dto.LicensePlate,
-            Color = dto.Color,
-            Generation = generation
-        };
-
-        _vehicleRepository.AddAsync(vehicle);
-
-        return MapToDto(vehicle);
+        var vehicle = request.ToDomain();
+        var createdVehicle = await _vehicleRepository.AddAsync(vehicle);
+        return createdVehicle.ToDto();
     }
 
     /// <summary>
-    /// Retrieves a vehicle by its unique identifier
+    /// Retrieves a specific vehicle by its unique identifier
     /// </summary>
     /// <param name="id">The unique identifier of the vehicle</param>
-    /// <returns>The vehicle data transfer object</returns>
-    /// <exception cref="KeyNotFoundException">Thrown when vehicle with specified ID is not found</exception>
-    public VehicleDto Get(Guid id)
+    /// <returns>The vehicle data transfer object if found; otherwise, null</returns>
+    public async Task<VehicleDto?> GetAsync(Guid id)
     {
-        var vehicle = _vehicleRepository.GetByIdAsync(id).Result;
-        if (vehicle == null)
-            throw new KeyNotFoundException($"Vehicle with ID {id} not found");
-
-        return MapToDto(vehicle);
+        var vehicle = await _vehicleRepository.GetByIdAsync(id);
+        return vehicle?.ToDto();
     }
 
     /// <summary>
-    /// Retrieves all vehicle records
+    /// Retrieves all vehicle records from the system
     /// </summary>
     /// <returns>List of all vehicle data transfer objects</returns>
-    public List<VehicleDto> GetAll()
+    public async Task<List<VehicleDto>> GetAllAsync()
     {
-        var vehicles = _vehicleRepository.GetAllAsync().Result;
-        return vehicles.Select(MapToDto).ToList();
+        var vehicles = await _vehicleRepository.GetAllAsync();
+        return vehicles.ConvertAll(v => v.ToDto());
     }
 
     /// <summary>
-    /// Updates an existing vehicle record
+    /// Updates an existing vehicle's information
     /// </summary>
-    /// <param name="dto">Data transfer object containing updated vehicle details</param>
     /// <param name="id">The unique identifier of the vehicle to update</param>
-    /// <returns>The updated vehicle data transfer object</returns>
-    /// <exception cref="KeyNotFoundException">Thrown when vehicle with specified ID is not found</exception>
-    /// <exception cref="ArgumentException">Thrown when vehicle generation is not found</exception>
-    public VehicleDto Update(VehicleCreateUpdateDto dto, Guid id)
+    /// <param name="request">Data transfer object containing updated vehicle details</param>
+    /// <returns>The updated vehicle data transfer object if successful; otherwise, null</returns>
+    /// <exception cref="ArgumentException">Thrown when the specified model generation does not exist</exception>
+    public async Task<VehicleDto?> UpdateAsync(Guid id, UpdateVehicleRequest request)
     {
-        var existingVehicle = _vehicleRepository.GetByIdAsync(id).Result;
+        var existingVehicle = await _vehicleRepository.GetByIdAsync(id);
         if (existingVehicle == null)
-            throw new KeyNotFoundException($"Vehicle with ID {id} not found");
+            return null;
 
-        if (existingVehicle.Generation.Id != dto.GenerationId)
-        {
-            var generation = _generationRepository.GetByIdAsync(dto.GenerationId).Result;
-            if (generation == null)
-                throw new ArgumentException($"Vehicle generation with ID {dto.GenerationId} not found");
-            existingVehicle.Generation = generation;
-        }
+        var modelGeneration = await _modelGenerationRepository.GetByIdAsync(request.ModelGenerationId);
+        if (modelGeneration == null)
+            throw new ArgumentException($"Model generation with ID {request.ModelGenerationId} does not exist");
 
-        existingVehicle.LicensePlate = dto.LicensePlate;
-        existingVehicle.Color = dto.Color;
+        existingVehicle.LicensePlate = request.LicensePlate;
+        existingVehicle.Color = request.Color;
+        existingVehicle.GenerationId = request.ModelGenerationId;
 
-        _vehicleRepository.UpdateAsync(existingVehicle);
-
-        return MapToDto(existingVehicle);
+        var updatedVehicle = await _vehicleRepository.UpdateAsync(existingVehicle);
+        return updatedVehicle.ToDto();
     }
 
     /// <summary>
-    /// Deletes a vehicle record by its identifier
+    /// Deletes a vehicle record from the system
     /// </summary>
     /// <param name="id">The unique identifier of the vehicle to delete</param>
     /// <returns>True if deletion was successful, otherwise false</returns>
-    public bool Delete(Guid id)
+    public async Task<bool> DeleteAsync(Guid id)
     {
-        return _vehicleRepository.DeleteAsync(id).Result;
-    }
-
-    /// <summary>
-    /// Retrieves a vehicle by its license plate number
-    /// </summary>
-    /// <param name="licensePlate">The license plate number</param>
-    /// <returns>The vehicle data transfer object if found, otherwise null</returns>
-    public VehicleDto? GetByLicensePlate(string licensePlate)
-    {
-        var vehicle = _vehicleRepository.GetByLicensePlateAsync(licensePlate).Result;
-        return vehicle != null ? MapToDto(vehicle) : null;
-    }
-
-    /// <summary>
-    /// Retrieves all vehicles of a specific model
-    /// </summary>
-    /// <param name="modelId">The unique identifier of the vehicle model</param>
-    /// <returns>List of vehicle data transfer objects for the specified model</returns>
-    public List<VehicleDto> GetByModel(Guid modelId)
-    {
-        var vehicles = _vehicleRepository.GetByModelAsync(modelId).Result;
-        return vehicles.Select(MapToDto).ToList();
-    }
-
-    /// <summary>
-    /// Maps a Vehicle domain entity to a VehicleDto data transfer object
-    /// </summary>
-    /// <param name="vehicle">The vehicle domain entity</param>
-    /// <returns>The mapped vehicle data transfer object</returns>
-    private static VehicleDto MapToDto(Vehicle vehicle)
-    {
-        return new VehicleDto
-        {
-            Id = vehicle.Id,
-            LicensePlate = vehicle.LicensePlate,
-            Color = vehicle.Color,
-            GenerationId = vehicle.Generation.Id,
-            VehicleInfo = $"{vehicle.Generation.Model.Name} {vehicle.Generation.Year} ({vehicle.Color}) - {vehicle.LicensePlate}"
-        };
+        return await _vehicleRepository.DeleteAsync(id);
     }
 }

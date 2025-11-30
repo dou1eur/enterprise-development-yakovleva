@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace CarRentalService.Application.Contracts;
 
 /// <summary>
-/// Data transfer object for creating or updating a rental
+/// Data transfer object for creating a rental
 /// </summary>
-public class RentalCreateUpdateDto
+public class CreateRentalRequest
 {
     /// <summary>
     /// Date and time when the rental starts
@@ -19,15 +19,15 @@ public class RentalCreateUpdateDto
     /// <summary>
     /// Duration of the rental in hours
     /// </summary>
-    public int DurationHours { get; set; }
+    public int RentalDurationHours { get; set; }
 
     /// <summary>
     /// Identifier of the vehicle to rent
     /// </summary>
-    public Guid CarId { get; set; }
+    public Guid VehicleId { get; set; }
 
     /// <summary>
     /// Identifier of the renter
     /// </summary>
-    public Guid RenterId { get; set; }
+    public Guid CustomerId { get; set; }
 }
