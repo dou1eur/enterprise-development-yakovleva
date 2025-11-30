@@ -22,7 +22,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\CarRentalService.Application\CarRentalService.Application.csproj" />
 		<ProjectReference Include="..\CarRentalService\CarRentalService.csproj" />
-		<ProjectReference Include="..\CarRentalService.Infrastructure\CarRentalService.Infrastructure.csproj" />
 	</ItemGroup>
 
 </Project>
