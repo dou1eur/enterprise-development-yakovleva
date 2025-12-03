@@ -17,7 +17,10 @@ public class CarRentalDbContext : DbContext
     {
     }
 
-    // DbSets
+    protected CarRentalDbContext() : base()
+    {
+    }
+
     public DbSet<RenterEntity> Renters { get; set; }
     public DbSet<VehicleEntity> Vehicles { get; set; }
     public DbSet<VehicleModelEntity> VehicleModels { get; set; }
@@ -28,7 +31,6 @@ public class CarRentalDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Apply entity configurations
         modelBuilder.ApplyConfiguration(new RenterEntityConfiguration());
         modelBuilder.ApplyConfiguration(new VehicleEntityConfiguration());
         modelBuilder.ApplyConfiguration(new VehicleModelEntityConfiguration());

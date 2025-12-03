@@ -1,29 +1,32 @@
-using CarRentalService.Application.Interfaces;
-using CarRentalService.Application.Interfaces.Repositories;
-using CarRentalService.Application.Services;
-using CarRentalService.Infrastructure.InMemory.Repositories;
+using CarRentalService.Application;
+using CarRentalService.Infrastructure;
+using CarRentalService.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-
-builder.Services.AddSingleton<IRenterRepository, RenterRepository>();
-builder.Services.AddSingleton<IVehicleRepository, VehicleRepository>();
-builder.Services.AddSingleton<IVehicleModelRepository, VehicleModelRepository>();
-builder.Services.AddSingleton<IModelGenerationRepository, ModelGenerationRepository>();
-builder.Services.AddSingleton<IRentalRepository, RentalRepository>();
-
-builder.Services.AddScoped<IRenterService, RenterService>();
-builder.Services.AddScoped<IVehicleService, VehicleService>();
-builder.Services.AddScoped<IVehicleModelService, VehicleModelService>();
-builder.Services.AddScoped<IModelGenerationService, ModelGenerationService>();
-builder.Services.AddScoped<IRentalService, RentalService>();
-builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
-
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new()
+    {
+        Title = "Car Rental Service API",
+        Version = "v1"
+    });
+});
+
+builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddApplication();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<CarRentalDbContext>();
+    await context.Database.MigrateAsync();
+}
 
 if (app.Environment.IsDevelopment())
 {
