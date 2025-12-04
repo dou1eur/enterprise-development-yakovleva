@@ -5,6 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddApplication();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -16,16 +20,17 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddInfrastructure(builder.Configuration);
-
-builder.Services.AddApplication();
-
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+try
 {
+    using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<CarRentalDbContext>();
     await context.Database.MigrateAsync();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Database error: {ex.Message}");
 }
 
 if (app.Environment.IsDevelopment())
