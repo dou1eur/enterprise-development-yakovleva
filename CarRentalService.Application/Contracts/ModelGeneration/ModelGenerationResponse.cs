@@ -1,40 +1,43 @@
 ﻿using CarRentalService.Domain;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace CarRentalService.Application.Contracts;
+namespace CarRentalService.Application.Contracts.ModelGeneration;
 
 /// <summary>
-/// Data transfer object for model generation information
+/// Response DTO for model generation information
 /// </summary>
-public class ModelGenerationDto
-{
+public sealed record ModelGenerationResponse(
     /// <summary>
     /// Unique identifier for the model generation
     /// </summary>
-    public Guid Id { get; set; }
+    Guid Id,
 
     /// <summary>
     /// Production year of this generation
     /// </summary>
-    public int Year { get; set; }
+    int Year,
 
     /// <summary>
     /// Engine displacement in liters
     /// </summary>
-    public double EngineVolume { get; set; }
+    double EngineVolume,
 
     /// <summary>
     /// Transmission type of the generation
     /// </summary>
-    public Transmission Transmission { get; set; }
+    Transmission Transmission,
 
     /// <summary>
     /// Rental price per hour
     /// </summary>
-    public decimal RentalPricePerHour { get; set; }
+    decimal RentalPricePerHour,
 
     /// <summary>
     /// Identifier of the vehicle model
     /// </summary>
-    public Guid VehicleModelId { get; set; }
-}
+    Guid VehicleModelId
+);

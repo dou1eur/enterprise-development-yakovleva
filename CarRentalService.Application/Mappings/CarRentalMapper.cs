@@ -1,4 +1,9 @@
-﻿using CarRentalService.Application.Contracts;
+﻿using CarRentalService.Application.Contracts.Common;
+using CarRentalService.Application.Contracts.ModelGeneration;
+using CarRentalService.Application.Contracts.Rental;
+using CarRentalService.Application.Contracts.Renter;
+using CarRentalService.Application.Contracts.Vehicle;
+using CarRentalService.Application.Contracts.VehicleModel;
 using CarRentalService.Domain;
 using System;
 using System.Collections.Generic;
@@ -9,206 +14,195 @@ using System.Threading.Tasks;
 namespace CarRentalService.Application.Mappings;
 
 /// <summary>
-/// Mapper for converting between domain entities and DTOs
+/// Provides mapping methods between domain entities and DTOs (Data Transfer Objects)
+/// This static class contains extension methods for converting between domain models and contract DTOs
 /// </summary>
 public static class CarRentalMapper
 {
-    // Domain to DTO mappings
+    /// <summary>
+    /// Converts a <see cref="ModelGeneration"/> domain entity to a <see cref="ModelGenerationResponse"/> DTO
+    /// </summary>
+    public static ModelGenerationResponse ToResponse(this ModelGeneration domain) =>
+        new(
+            domain.Id,
+            domain.Year,
+            domain.EngineVolume,
+            domain.Transmission,
+            domain.RentalPricePerHour,
+            domain.VehicleModelId
+        );
 
     /// <summary>
-    /// Converts a Renter domain entity to RenterDto
+    /// Converts a <see cref="Rental"/> domain entity to a <see cref="RentalResponse"/> DTO
     /// </summary>
-    /// <param name="renter">The renter domain entity</param>
-    /// <returns>The renter DTO</returns>
-    public static RenterDto ToDto(this Renter renter) => new()
-    {
-        Id = renter.Id,
-        LicenseNumber = renter.LicenseNumber,
-        FullName = renter.FullName,
-        DateOfBirth = renter.DateOfBirth
-    };
+    public static RentalResponse ToResponse(this Rental domain) =>
+        new(
+            domain.Id,
+            domain.RentStartTime,
+            domain.DurationHours,
+            domain.TotalCost,
+            domain.VehicleId,
+            domain.RenterId
+        );
 
     /// <summary>
-    /// Converts a Vehicle domain entity to VehicleDto
+    /// Converts a <see cref="Renter"/> domain entity to a <see cref="RenterResponse"/> DTO
     /// </summary>
-    /// <param name="vehicle">The vehicle domain entity</param>
-    /// <returns>The vehicle DTO</returns>
-    public static VehicleDto ToDto(this Vehicle vehicle) => new()
-    {
-        Id = vehicle.Id,
-        LicensePlate = vehicle.LicensePlate,
-        Color = vehicle.Color,
-        ModelGenerationId = vehicle.GenerationId
-    };
+    public static RenterResponse ToResponse(this Renter domain) =>
+        new(
+            domain.Id,
+            domain.LicenseNumber,
+            domain.FullName,
+            domain.DateOfBirth
+        );
 
     /// <summary>
-    /// Converts a VehicleModel domain entity to VehicleModelDto
+    /// Converts a <see cref="Vehicle"/> domain entity to a <see cref="VehicleResponse"/> DTO
     /// </summary>
-    /// <param name="vehicleModel">The vehicle model domain entity</param>
-    /// <returns>The vehicle model DTO</returns>
-    public static VehicleModelDto ToDto(this VehicleModel vehicleModel) => new()
-    {
-        Id = vehicleModel.Id,
-        Name = vehicleModel.Name,
-        DriveType = vehicleModel.DriveType,
-        SeatCount = vehicleModel.SeatCount,
-        BodyType = vehicleModel.BodyType,
-        VehicleClass = vehicleModel.VehicleClass
-    };
+    public static VehicleResponse ToResponse(this Vehicle domain) =>
+        new(
+            domain.Id,
+            domain.LicensePlate,
+            domain.Color,
+            domain.GenerationId
+        );
 
     /// <summary>
-    /// Converts a ModelGeneration domain entity to ModelGenerationDto
+    /// Converts a <see cref="VehicleModel"/> domain entity to a <see cref="VehicleModelResponse"/> DTO
     /// </summary>
-    /// <param name="modelGeneration">The model generation domain entity</param>
-    /// <returns>The model generation DTO</returns>
-    public static ModelGenerationDto ToDto(this ModelGeneration modelGeneration) => new()
-    {
-        Id = modelGeneration.Id,
-        Year = modelGeneration.Year,
-        EngineVolume = modelGeneration.EngineVolume,
-        Transmission = modelGeneration.Transmission,
-        RentalPricePerHour = modelGeneration.RentalPricePerHour,
-        VehicleModelId = modelGeneration.VehicleModelId
-    };
+    public static VehicleModelResponse ToResponse(this VehicleModel domain) =>
+        new(
+            domain.Id,
+            domain.Name,
+            domain.DriveType,
+            domain.SeatCount,
+            domain.BodyType,
+            domain.VehicleClass
+        );
 
     /// <summary>
-    /// Converts a Rental domain entity to RentalDto
+    /// Converts a <see cref="ModelGenerationRequest"/> DTO to a <see cref="ModelGeneration"/> domain entity
     /// </summary>
-    /// <param name="rental">The rental domain entity</param>
-    /// <returns>The rental DTO</returns>
-    public static RentalDto ToDto(this Rental rental) => new()
-    {
-        Id = rental.Id,
-        RentStartTime = rental.RentStartTime,
-        RentalDurationHours = rental.DurationHours,
-        TotalCost = rental.TotalCost,
-        VehicleId = rental.VehicleId,
-        CustomerId = rental.RenterId
-    };
-
-    // Request to Domain mappings
+    public static ModelGeneration ToDomain(this ModelGenerationRequest request, Guid? id = null) =>
+        new()
+        {
+            Id = id ?? Guid.NewGuid(),
+            Year = request.Year,
+            EngineVolume = request.EngineVolume,
+            Transmission = request.Transmission,
+            RentalPricePerHour = request.RentalPricePerHour,
+            VehicleModelId = request.VehicleModelId
+        };
 
     /// <summary>
-    /// Converts a CreateRenterRequest to Renter domain entity
+    /// Converts a <see cref="RentalRequest"/> DTO to a <see cref="Rental"/> domain entity
     /// </summary>
-    /// <param name="request">The create renter request</param>
-    /// <returns>The renter domain entity</returns>
-    public static Renter ToDomain(this CreateRenterRequest request) => new()
-    {
-        LicenseNumber = request.LicenseNumber,
-        FullName = request.FullName,
-        DateOfBirth = request.DateOfBirth
-    };
+    public static Rental ToDomain(this RentalRequest request, Guid? id = null) =>
+        new()
+        {
+            Id = id ?? Guid.NewGuid(),
+            RentStartTime = request.RentStartTime,
+            DurationHours = request.RentalDurationHours,
+            VehicleId = request.VehicleId,
+            RenterId = request.CustomerId,
+            TotalCost = 0
+        };
 
     /// <summary>
-    /// Converts a CreateVehicleRequest to Vehicle domain entity
+    /// Converts a <see cref="RenterRequest"/> DTO to a <see cref="Renter"/> domain entity
     /// </summary>
-    /// <param name="request">The create vehicle request</param>
-    /// <returns>The vehicle domain entity</returns>
-    public static Vehicle ToDomain(this CreateVehicleRequest request) => new()
-    {
-        LicensePlate = request.LicensePlate,
-        Color = request.Color,
-        GenerationId = request.ModelGenerationId
-    };
+    public static Renter ToDomain(this RenterRequest request, Guid? id = null) =>
+        new()
+        {
+            Id = id ?? Guid.NewGuid(),
+            LicenseNumber = request.LicenseNumber,
+            FullName = request.FullName,
+            DateOfBirth = request.DateOfBirth
+        };
 
     /// <summary>
-    /// Converts a CreateVehicleModelRequest to VehicleModel domain entity
+    /// Converts a <see cref="VehicleRequest"/> DTO to a <see cref="Vehicle"/> domain entity
     /// </summary>
-    /// <param name="request">The create vehicle model request</param>
-    /// <returns>The vehicle model domain entity</returns>
-    public static VehicleModel ToDomain(this CreateVehicleModelRequest request) => new()
-    {
-        Name = request.Name,
-        DriveType = request.DriveType,
-        SeatCount = request.SeatCount,
-        BodyType = request.BodyType,
-        VehicleClass = request.VehicleClass
-    };
+    public static Vehicle ToDomain(this VehicleRequest request, Guid? id = null) =>
+        new()
+        {
+            Id = id ?? Guid.NewGuid(),
+            LicensePlate = request.LicensePlate,
+            Color = request.Color,
+            GenerationId = request.ModelGenerationId
+        };
 
     /// <summary>
-    /// Converts a CreateModelGenerationRequest to ModelGeneration domain entity
+    /// Converts a <see cref="VehicleModelRequest"/> DTO to a <see cref="VehicleModel"/> domain entity
     /// </summary>
-    /// <param name="request">The create model generation request</param>
-    /// <returns>The model generation domain entity</returns>
-    public static ModelGeneration ToDomain(this CreateModelGenerationRequest request) => new()
-    {
-        Year = request.Year,
-        EngineVolume = request.EngineVolume,
-        Transmission = request.Transmission,
-        RentalPricePerHour = request.RentalPricePerHour,
-        VehicleModelId = request.VehicleModelId
-    };
+    public static VehicleModel ToDomain(this VehicleModelRequest request, Guid? id = null) =>
+        new()
+        {
+            Id = id ?? Guid.NewGuid(),
+            Name = request.Name,
+            DriveType = request.DriveType,
+            SeatCount = request.SeatCount,
+            BodyType = request.BodyType,
+            VehicleClass = request.VehicleClass
+        };
 
     /// <summary>
-    /// Converts a CreateRentalRequest to Rental domain entity
+    /// Converts a tuple of (Vehicle, int) to a <see cref="VehicleRentalCountResponse"/> DTO
     /// </summary>
-    /// <param name="request">The create rental request</param>
-    /// <returns>The rental domain entity</returns>
-    public static Rental ToDomain(this CreateRentalRequest request) => new()
-    {
-        RentStartTime = request.RentStartTime,
-        DurationHours = request.RentalDurationHours,
-        VehicleId = request.VehicleId,
-        RenterId = request.CustomerId,
-        TotalCost = 0 // Will be calculated in service
-    };
-
-    // Collection response mappings
+    public static VehicleRentalCountResponse ToResponse(this (Vehicle Vehicle, int RentalCount) tuple) =>
+        new(tuple.Vehicle.ToResponse(), tuple.RentalCount);
 
     /// <summary>
-    /// Converts a list of renters to RenterCollectionResponse
+    /// Converts a tuple of (Renter, decimal) to a <see cref="RenterTotalSpentResponse"/> DTO
     /// </summary>
-    /// <param name="renters">List of renter domain entities</param>
-    /// <returns>The renter collection response</returns>
-    public static RenterCollectionResponse ToResponse(this List<Renter> renters) =>
-        new(renters.Select(ToDto).ToList());
+    public static RenterTotalSpentResponse ToResponse(this (Renter Renter, decimal TotalSpent) tuple) =>
+        new(tuple.Renter.ToResponse(), tuple.TotalSpent);
 
     /// <summary>
-    /// Converts a list of vehicles to VehicleCollectionResponse
+    /// Converts a collection of <see cref="ModelGeneration"/> entities to a list of <see cref="ModelGenerationResponse"/> DTOs
     /// </summary>
-    /// <param name="vehicles">List of vehicle domain entities</param>
-    /// <returns>The vehicle collection response</returns>
-    public static VehicleCollectionResponse ToResponse(this List<Vehicle> vehicles) =>
-        new(vehicles.Select(ToDto).ToList());
+    public static List<ModelGenerationResponse> ToResponseList(this IEnumerable<ModelGeneration> domains) =>
+        domains.Select(ToResponse).ToList();
 
     /// <summary>
-    /// Converts a list of vehicle models to VehicleModelCollectionResponse
+    /// Converts a collection of <see cref="Rental"/> entities to a list of <see cref="RentalResponse"/> DTOs
     /// </summary>
-    /// <param name="vehicleModels">List of vehicle model domain entities</param>
-    /// <returns>The vehicle model collection response</returns>
-    public static VehicleModelCollectionResponse ToResponse(this List<VehicleModel> vehicleModels) =>
-        new(vehicleModels.Select(ToDto).ToList());
+    public static List<RentalResponse> ToResponseList(this IEnumerable<Rental> domains) =>
+        domains.Select(ToResponse).ToList();
 
     /// <summary>
-    /// Converts a list of model generations to ModelGenerationCollectionResponse
+    /// Converts a collection of <see cref="Renter"/> entities to a list of <see cref="RenterResponse"/> DTOs
     /// </summary>
-    /// <param name="modelGenerations">List of model generation domain entities</param>
-    /// <returns>The model generation collection response</returns>
-    public static ModelGenerationCollectionResponse ToResponse(this List<ModelGeneration> modelGenerations) =>
-        new(modelGenerations.Select(ToDto).ToList());
+    public static List<RenterResponse> ToResponseList(this IEnumerable<Renter> domains) =>
+        domains.Select(ToResponse).ToList();
 
     /// <summary>
-    /// Converts a list of rentals to RentalCollectionResponse
+    /// Converts a collection of <see cref="Vehicle"/> entities to a list of <see cref="VehicleResponse"/> DTOs
     /// </summary>
-    /// <param name="rentals">List of rental domain entities</param>
-    /// <returns>The rental collection response</returns>
-    public static RentalCollectionResponse ToResponse(this List<Rental> rentals) =>
-        new(rentals.Select(ToDto).ToList());
+    public static List<VehicleResponse> ToResponseList(this IEnumerable<Vehicle> domains) =>
+        domains.Select(ToResponse).ToList();
 
     /// <summary>
-    /// Converts a list of vehicle rental counts to VehicleRentalCountCollectionResponse
+    /// Converts a collection of <see cref="VehicleModel"/> entities to a list of <see cref="VehicleModelResponse"/> DTOs
     /// </summary>
-    /// <param name="vehicleRentalCounts">List of vehicle rental count DTOs</param>
-    /// <returns>The vehicle rental count collection response</returns>
-    public static VehicleRentalCountCollectionResponse ToResponse(this List<VehicleRentalCountDto> vehicleRentalCounts) =>
-        new(vehicleRentalCounts);
+    public static List<VehicleModelResponse> ToResponseList(this IEnumerable<VehicleModel> domains) =>
+        domains.Select(ToResponse).ToList();
 
     /// <summary>
-    /// Converts a list of renter total spent to RenterTotalSpentCollectionResponse
+    /// Converts a collection of vehicle rental count tuples to a list of <see cref="VehicleRentalCountResponse"/> DTOs
     /// </summary>
-    /// <param name="renterTotalSpents">List of renter total spent DTOs</param>
-    /// <returns>The renter total spent collection response</returns>
-    public static RenterTotalSpentCollectionResponse ToResponse(this List<RenterTotalSpentDto> renterTotalSpents) =>
-        new(renterTotalSpents);
+    public static List<VehicleRentalCountResponse> ToResponseList(this IEnumerable<(Vehicle Vehicle, int RentalCount)> tuples) =>
+        tuples.Select(ToResponse).ToList();
+
+    /// <summary>
+    /// Converts a collection of renter total spent tuples to a list of <see cref="RenterTotalSpentResponse"/> DTOs
+    /// </summary>
+    public static List<RenterTotalSpentResponse> ToResponseList(this IEnumerable<(Renter Renter, decimal TotalSpent)> tuples) =>
+        tuples.Select(ToResponse).ToList();
+
+    /// <summary>
+    /// Creates a <see cref="CollectionResponse{T}"/> from a collection of items
+    /// </summary>
+    public static CollectionResponse<T> ToCollectionResponse<T>(this IEnumerable<T> items) =>
+        new(items.ToList());
 }

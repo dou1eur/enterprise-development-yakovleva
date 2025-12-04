@@ -5,35 +5,39 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CarRentalService.Application.Contracts;
+namespace CarRentalService.Application.Contracts.VehicleModel;
 
 /// <summary>
-/// Data transfer object for creating a vehicle model
+/// Response DTO for vehicle model information
 /// </summary>
-public class CreateVehicleModelRequest
-{
+public sealed record VehicleModelResponse(
+    /// <summary>
+    /// Unique identifier for the vehicle model
+    /// </summary>
+    Guid Id,
+
     /// <summary>
     /// Name of the model
     /// </summary>
-    public string Name { get; set; } = string.Empty;
+    string Name,
 
     /// <summary>
     /// Drivetrain type of the vehicle
     /// </summary>
-    public Domain.DriveType DriveType { get; set; }
+    Domain.DriveType DriveType,
 
     /// <summary>
     /// Number of passenger seats
     /// </summary>
-    public int SeatCount { get; set; }
+    int SeatCount,
 
     /// <summary>
     /// Body type of the vehicle
     /// </summary>
-    public BodyType BodyType { get; set; }
+    BodyType BodyType,
 
     /// <summary>
     /// Vehicle class category
     /// </summary>
-    public VehicleClass VehicleClass { get; set; }
-}
+    VehicleClass VehicleClass
+);

@@ -4,25 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CarRentalService.Application.Contracts;
+namespace CarRentalService.Application.Contracts.Renter;
 
 /// <summary>
-/// Data transfer object for updating renter information
+/// Request DTO for creating or updating a renter
 /// </summary>
-public class UpdateRenterRequest
-{
+public sealed record RenterRequest(
     /// <summary>
     /// Driver's license number of the renter
     /// </summary>
-    public string LicenseNumber { get; set; } = string.Empty;
+    string LicenseNumber,
 
     /// <summary>
     /// Full name of the renter
     /// </summary>
-    public string FullName { get; set; } = string.Empty;
+    string FullName,
 
     /// <summary>
     /// Date of birth of the renter
     /// </summary>
-    public DateTime DateOfBirth { get; set; }
-}
+    DateTime DateOfBirth
+);

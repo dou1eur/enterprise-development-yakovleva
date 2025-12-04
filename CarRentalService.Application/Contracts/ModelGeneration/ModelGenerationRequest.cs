@@ -5,35 +5,34 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CarRentalService.Application.Contracts;
+namespace CarRentalService.Application.Contracts.ModelGeneration;
 
 /// <summary>
-/// Data transfer object for updating a model generation
+/// Request DTO for creating or updating a model generation
 /// </summary>
-public class UpdateModelGenerationRequest
-{
+public sealed record ModelGenerationRequest(
     /// <summary>
     /// Production year of this generation
     /// </summary>
-    public int Year { get; set; }
+    int Year,
 
     /// <summary>
     /// Engine displacement in liters
     /// </summary>
-    public double EngineVolume { get; set; }
+    double EngineVolume,
 
     /// <summary>
     /// Transmission type of the generation
     /// </summary>
-    public Transmission Transmission { get; set; }
+    Transmission Transmission,
 
     /// <summary>
     /// Rental price per hour
     /// </summary>
-    public decimal RentalPricePerHour { get; set; }
+    decimal RentalPricePerHour,
 
     /// <summary>
     /// Identifier of the vehicle model
     /// </summary>
-    public Guid VehicleModelId { get; set; }
-}
+    Guid VehicleModelId
+);

@@ -1,124 +1,83 @@
-﻿using CarRentalService.Application.Contracts;
+﻿using CarRentalService.Application.Contracts.Common;
 using CarRentalService.Application.Interfaces;
-using CarRentalService.Application.Mappings;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarRentalService.Api.Host.Controllers;
 
 /// <summary>
-/// Controller providing analytics endpoints for rentals, vehicles, and renters
+/// Controller for analytical data and reports
+/// Provides various analytical queries for business intelligence
 /// </summary>
-[Route("api/[controller]")]
 [ApiController]
+[Route("api/[controller]")]
 public class AnalyticsController : ControllerBase
 {
     private readonly IAnalyticsService _analyticsService;
-    private readonly ILogger<AnalyticsController> _logger;
 
     /// <summary>
-    /// Initializes a new instance of AnalyticsController
+    /// Initializes a new instance of the AnalyticsController class
     /// </summary>
-    /// <param name="analyticsService">Analytics service handling complex queries</param>
-    /// <param name="logger">Logger instance</param>
-    public AnalyticsController(IAnalyticsService analyticsService, ILogger<AnalyticsController> logger)
+    /// <param name="analyticsService">The analytics service</param>
+    public AnalyticsController(IAnalyticsService analyticsService)
     {
         _analyticsService = analyticsService;
-        _logger = logger;
     }
 
     /// <summary>
-    /// Returns all renters who rented vehicles of a specified model, ordered by full name
+    /// Gets all renters who rented vehicles of a specified model, ordered by full name
     /// </summary>
-    /// <param name="vehicleModelId">The vehicle model identifier</param>
-    /// <returns>List of renters ordered by full name</returns>
-    [HttpGet("renters-by-model/{vehicleModelId:guid}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<RenterCollectionResponse>> GetRentersByVehicleModel(Guid vehicleModelId)
+    /// <param name="vehicleModelId">The vehicle model ID</param>
+    /// <returns>List of renters with total spent amounts</returns>
+    [HttpGet("renters-by-model/{vehicleModelId}")]
+    public async Task<ActionResult<List<RenterTotalSpentResponse>>> GetRentersByVehicleModel(Guid vehicleModelId)
     {
-        _logger.LogInformation("Called GetRentersByVehicleModel with model ID: {VehicleModelId}", vehicleModelId);
-
         var result = await _analyticsService.GetRentersByVehicleModelAsync(vehicleModelId);
-        if (result.Count == 0)
-            return NotFound($"No renters found for vehicle model with ID {vehicleModelId}");
-
-        var response = new RenterCollectionResponse(result.ConvertAll(r => r.ToDto()));
-        return Ok(response);
+        return Ok(result);
     }
 
     /// <summary>
-    /// Returns all vehicles that are currently rented
+    /// Gets all vehicles that are currently rented
     /// </summary>
-    /// <returns>List of currently rented vehicles</returns>
-    [HttpGet("vehicles-rented")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<VehicleCollectionResponse>> GetVehiclesCurrentlyRented()
+    /// <returns>List of currently rented vehicles with rental counts</returns>
+    [HttpGet("vehicles-currently-rented")]
+    public async Task<ActionResult<List<VehicleRentalCountResponse>>> GetVehiclesCurrentlyRented()
     {
-        _logger.LogInformation("Called GetVehiclesCurrentlyRented");
-
         var result = await _analyticsService.GetVehiclesCurrentlyRentedAsync();
-        if (result.Count == 0)
-            return NotFound("No vehicles are currently rented");
-
-        var response = new VehicleCollectionResponse(result.ConvertAll(v => v.ToDto()));
-        return Ok(response);
+        return Ok(result);
     }
 
     /// <summary>
-    /// Returns top 5 most frequently rented vehicles
+    /// Gets top N most frequently rented vehicles
     /// </summary>
-    /// <returns>List of top 5 most frequently rented vehicles with rental counts</returns>
-    [HttpGet("top-vehicles")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<VehicleRentalCountCollectionResponse>> GetTopVehicles()
+    /// <param name="top">Number of top vehicles to return (default: 5)</param>
+    /// <returns>List of top rented vehicles with rental counts</returns>
+    [HttpGet("top-rented-vehicles")]
+    public async Task<ActionResult<List<VehicleRentalCountResponse>>> GetTopRentedVehicles([FromQuery] int top = 5)
     {
-        _logger.LogInformation("Called GetTopVehicles");
-
-        var result = await _analyticsService.GetTopRentedVehiclesAsync(5);
-        var response = result
-            .Select(x => new VehicleRentalCountDto(x.Vehicle.ToDto(), x.RentalCount))
-            .ToList()
-            .ToResponse();
-
-        return Ok(response);
+        var result = await _analyticsService.GetTopRentedVehiclesAsync(top);
+        return Ok(result);
     }
 
     /// <summary>
-    /// Returns the number of rentals for each vehicle
+    /// Gets the number of rentals for each vehicle
     /// </summary>
     /// <returns>List of vehicles with their rental counts</returns>
     [HttpGet("rental-count-per-vehicle")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<VehicleRentalCountCollectionResponse>> GetRentalCountPerVehicle()
+    public async Task<ActionResult<List<VehicleRentalCountResponse>>> GetRentalCountPerVehicle()
     {
-        _logger.LogInformation("Called GetRentalCountPerVehicle");
-
         var result = await _analyticsService.GetRentalCountPerVehicleAsync();
-        var response = result
-            .Select(x => new VehicleRentalCountDto(x.Vehicle.ToDto(), x.RentalCount))
-            .ToList()
-            .ToResponse();
-
-        return Ok(response);
+        return Ok(result);
     }
 
     /// <summary>
-    /// Returns top 5 renters by total amount spent on rentals
+    /// Gets top N renters by total amount spent on rentals
     /// </summary>
-    /// <returns>List of top 5 renters by total spent amounts</returns>
-    [HttpGet("top-renters")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<RenterTotalSpentCollectionResponse>> GetTopRentersByRentalSum()
+    /// <param name="top">Number of top renters to return (default: 5)</param>
+    /// <returns>List of top renters with total spent amounts</returns>
+    [HttpGet("top-renters-by-spent")]
+    public async Task<ActionResult<List<RenterTotalSpentResponse>>> GetTopRentersByRentalSum([FromQuery] int top = 5)
     {
-        _logger.LogInformation("Called GetTopRentersByRentalSum");
-
-        var result = await _analyticsService.GetTopRentersByRentalSumAsync(5);
-        var response = result
-            .Select(x => new RenterTotalSpentDto(x.Renter.ToDto(), x.TotalSpent))
-            .ToList()
-            .ToResponse();
-
-        return Ok(response);
+        var result = await _analyticsService.GetTopRentersByRentalSumAsync(top);
+        return Ok(result);
     }
 }

@@ -1,43 +1,37 @@
-﻿using CarRentalService.Application.Contracts;
+﻿using CarRentalService.Application.Contracts.Vehicle;
 using System;
 using System.Collections.Generic;
 
 namespace CarRentalService.Application.Interfaces;
 
+/// <summary>
+/// Service interface for managing vehicle operations
+/// Provides methods for Create, Read, Update, and Delete (CRUD) operations on vehicles
+/// </summary>
 public interface IVehicleService
 {
     /// <summary>
-    /// Creates a new vehicle record
+    /// Creates a new vehicle record in the system
     /// </summary>
-    /// <param name="request">Data transfer object containing vehicle creation details</param>
-    /// <returns>The created vehicle data transfer object</returns>
-    public Task<VehicleDto> CreateAsync(CreateVehicleRequest request);
+    public Task<VehicleResponse> CreateAsync(VehicleRequest request);
 
     /// <summary>
-    /// Retrieves a vehicle by unique identifier
+    /// Retrieves a vehicle by its unique identifier
     /// </summary>
-    /// <param name="id">The unique identifier of the vehicle</param>
-    /// <returns>The vehicle data transfer object if found; otherwise, null</returns>
-    public Task<VehicleDto?> GetAsync(Guid id);
+    public Task<VehicleResponse?> GetAsync(Guid id);
 
     /// <summary>
-    /// Retrieves all vehicle records
+    /// Retrieves all vehicle records from the system
     /// </summary>
-    /// <returns>List of all vehicle data transfer objects</returns>
-    public Task<List<VehicleDto>> GetAllAsync();
+    public Task<List<VehicleResponse>> GetAllAsync();
 
     /// <summary>
-    /// Updates an existing vehicle record
+    /// Updates an existing vehicle's information
     /// </summary>
-    /// <param name="id">The unique identifier of the vehicle to update</param>
-    /// <param name="request">Data transfer object containing updated vehicle details</param>
-    /// <returns>The updated vehicle data transfer object if successful; otherwise, null</returns>
-    public Task<VehicleDto?> UpdateAsync(Guid id, UpdateVehicleRequest request);
+    public Task<VehicleResponse?> UpdateAsync(Guid id, VehicleRequest request);
 
     /// <summary>
-    /// Deletes a vehicle record by identifier
+    /// Deletes a vehicle record from the system
     /// </summary>
-    /// <param name="id">The unique identifier of the vehicle to delete</param>
-    /// <returns>True if deletion was successful, otherwise false</returns>
     public Task<bool> DeleteAsync(Guid id);
 }

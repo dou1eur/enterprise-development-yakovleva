@@ -4,40 +4,39 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CarRentalService.Application.Contracts;
+namespace CarRentalService.Application.Contracts.Rental;
 
 /// <summary>
-/// Data transfer object for rental information
+/// Response DTO for rental information
 /// </summary>
-public class RentalDto
-{
+public sealed record RentalResponse(
     /// <summary>
     /// Unique identifier for the rental
     /// </summary>
-    public Guid Id { get; set; }
+    Guid Id,
 
     /// <summary>
     /// Date and time when the rental starts
     /// </summary>
-    public DateTime RentStartTime { get; set; }
+    DateTime RentStartTime,
 
     /// <summary>
     /// Duration of the rental in hours
     /// </summary>
-    public int RentalDurationHours { get; set; }
+    int RentalDurationHours,
 
     /// <summary>
     /// Total cost of the rental
     /// </summary>
-    public decimal TotalCost { get; set; }
+    decimal TotalCost,
 
     /// <summary>
     /// Identifier of the rented vehicle
     /// </summary>
-    public Guid VehicleId { get; set; }
+    Guid VehicleId,
 
     /// <summary>
     /// Identifier of the customer
     /// </summary>
-    public Guid CustomerId { get; set; }
-}
+    Guid CustomerId
+);

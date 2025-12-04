@@ -4,30 +4,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CarRentalService.Application.Contracts;
+namespace CarRentalService.Application.Contracts.Rental;
 
 /// <summary>
-/// Data transfer object for creating a rental
+/// Request DTO for creating or updating a rental
 /// </summary>
-public class CreateRentalRequest
-{
+public sealed record RentalRequest(
     /// <summary>
     /// Date and time when the rental starts
     /// </summary>
-    public DateTime RentStartTime { get; set; }
+    DateTime RentStartTime,
 
     /// <summary>
     /// Duration of the rental in hours
     /// </summary>
-    public int RentalDurationHours { get; set; }
+    int RentalDurationHours,
 
     /// <summary>
     /// Identifier of the vehicle to rent
     /// </summary>
-    public Guid VehicleId { get; set; }
+    Guid VehicleId,
 
     /// <summary>
     /// Identifier of the renter
     /// </summary>
-    public Guid CustomerId { get; set; }
-}
+    Guid CustomerId
+);

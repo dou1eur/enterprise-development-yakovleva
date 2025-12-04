@@ -4,25 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CarRentalService.Application.Contracts;
+namespace CarRentalService.Application.Contracts.Vehicle;
 
 /// <summary>
-/// Data transfer object for updating a vehicle
+/// Request DTO for creating or updating a vehicle
 /// </summary>
-public class UpdateVehicleRequest
-{
+public sealed record VehicleRequest(
     /// <summary>
     /// License plate number of the vehicle
     /// </summary>
-    public string LicensePlate { get; set; } = string.Empty;
+    string LicensePlate,
 
     /// <summary>
     /// Color of the vehicle
     /// </summary>
-    public string Color { get; set; } = string.Empty;
+    string Color,
 
     /// <summary>
     /// Identifier of the vehicle generation
     /// </summary>
-    public Guid ModelGenerationId { get; set; }
-}
+    Guid ModelGenerationId
+);

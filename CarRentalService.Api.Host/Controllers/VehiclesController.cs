@@ -1,4 +1,4 @@
-﻿using CarRentalService.Application.Contracts;
+﻿using CarRentalService.Application.Contracts.Vehicle;
 using CarRentalService.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -6,12 +6,12 @@ using System;
 namespace CarRentalService.Api.Host.Controllers;
 
 /// <summary>
-/// API controller for managing vehicle operations
-/// Provides endpoints for vehicle CRUD operations
+/// Controller for managing vehicles
+/// Provides CRUD operations for vehicle entities
 /// </summary>
-[Route("api/[controller]")]
 [ApiController]
-public class VehiclesController : CrudControllerBase<VehicleDto, CreateVehicleRequest, UpdateVehicleRequest, Guid>
+[Route("api/[controller]")]
+public class VehiclesController : ControllerBase
 {
     private readonly IVehicleService _vehicleService;
 
@@ -19,23 +19,68 @@ public class VehiclesController : CrudControllerBase<VehicleDto, CreateVehicleRe
     /// Initializes a new instance of the VehiclesController class
     /// </summary>
     /// <param name="vehicleService">The vehicle service</param>
-    /// <param name="logger">The logger instance</param>
-    public VehiclesController(IVehicleService vehicleService, ILogger<VehiclesController> logger)
-        : base(logger)
+    public VehiclesController(IVehicleService vehicleService)
     {
         _vehicleService = vehicleService;
     }
 
     /// <summary>
-    /// Extracts the identifier from a vehicle DTO
+    /// Gets all vehicles
     /// </summary>
-    /// <param name="dto">The vehicle data transfer object</param>
-    /// <returns>The vehicle identifier</returns>
-    protected override object GetId(VehicleDto dto) => dto.Id;
+    /// <returns>List of all vehicles</returns>
+    [HttpGet]
+    public async Task<ActionResult<List<VehicleResponse>>> GetAll()
+    {
+        var vehicles = await _vehicleService.GetAllAsync();
+        return Ok(vehicles);
+    }
 
     /// <summary>
-    /// Gets the vehicle service instance
+    /// Gets a specific vehicle by ID
     /// </summary>
-    /// <returns>The vehicle service instance</returns>
-    protected override dynamic GetService() => _vehicleService;
+    /// <param name="id">The vehicle ID</param>
+    /// <returns>The vehicle if found</returns>
+    [HttpGet("{id}")]
+    public async Task<ActionResult<VehicleResponse>> Get(Guid id)
+    {
+        var vehicle = await _vehicleService.GetAsync(id);
+        return vehicle != null ? Ok(vehicle) : NotFound();
+    }
+
+    /// <summary>
+    /// Creates a new vehicle
+    /// </summary>
+    /// <param name="request">The vehicle creation request</param>
+    /// <returns>The created vehicle</returns>
+    [HttpPost]
+    public async Task<ActionResult<VehicleResponse>> Create([FromBody] VehicleRequest request)
+    {
+        var result = await _vehicleService.CreateAsync(request);
+        return CreatedAtAction(nameof(Get), new { id = result.Id }, result);
+    }
+
+    /// <summary>
+    /// Updates an existing vehicle
+    /// </summary>
+    /// <param name="id">The vehicle ID</param>
+    /// <param name="request">The vehicle update request</param>
+    /// <returns>The updated vehicle</returns>
+    [HttpPut("{id}")]
+    public async Task<ActionResult<VehicleResponse>> Update(Guid id, [FromBody] VehicleRequest request)
+    {
+        var result = await _vehicleService.UpdateAsync(id, request);
+        return result != null ? Ok(result) : NotFound();
+    }
+
+    /// <summary>
+    /// Deletes a vehicle
+    /// </summary>
+    /// <param name="id">The vehicle ID</param>
+    /// <returns>No content if successful</returns>
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(Guid id)
+    {
+        var result = await _vehicleService.DeleteAsync(id);
+        return result ? NoContent() : NotFound();
+    }
 }

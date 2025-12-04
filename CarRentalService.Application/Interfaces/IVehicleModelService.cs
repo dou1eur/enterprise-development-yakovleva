@@ -1,4 +1,5 @@
 ﻿using CarRentalService.Application.Contracts;
+using CarRentalService.Application.Contracts.VehicleModel;
 using CarRentalService.Domain;
 using System;
 using System.Collections.Generic;
@@ -7,42 +8,32 @@ namespace CarRentalService.Application.Interfaces;
 
 /// <summary>
 /// Service interface for managing vehicle model operations
-/// Provides methods for basic CRUD operations on vehicle models
+/// Provides methods for Create, Read, Update, and Delete (CRUD) operations on vehicle models
 /// </summary>
 public interface IVehicleModelService
 {
     /// <summary>
-    /// Creates a new vehicle model record
+    /// Creates a new vehicle model record in the system
     /// </summary>
-    /// <param name="request">Data transfer object containing vehicle model creation details</param>
-    /// <returns>The created vehicle model data transfer object</returns>
-    public Task<VehicleModelDto> CreateAsync(CreateVehicleModelRequest request);
+    public Task<VehicleModelResponse> CreateAsync(VehicleModelRequest request);
 
     /// <summary>
-    /// Retrieves a vehicle model by unique identifier
+    /// Retrieves a vehicle model by its unique identifier
     /// </summary>
-    /// <param name="id">The unique identifier of the vehicle model</param>
-    /// <returns>The vehicle model data transfer object if found; otherwise, null</returns>
-    public Task<VehicleModelDto?> GetAsync(Guid id);
+    public Task<VehicleModelResponse?> GetAsync(Guid id);
 
     /// <summary>
-    /// Retrieves all vehicle model records
+    /// Retrieves all vehicle model records from the system
     /// </summary>
-    /// <returns>List of all vehicle model data transfer objects</returns>
-    public Task<List<VehicleModelDto>> GetAllAsync();
+    public Task<List<VehicleModelResponse>> GetAllAsync();
 
     /// <summary>
-    /// Updates an existing vehicle model record
+    /// Updates an existing vehicle model's information
     /// </summary>
-    /// <param name="id">The unique identifier of the vehicle model to update</param>
-    /// <param name="request">Data transfer object containing updated vehicle model details</param>
-    /// <returns>The updated vehicle model data transfer object if successful; otherwise, null</returns>
-    public Task<VehicleModelDto?> UpdateAsync(Guid id, UpdateVehicleModelRequest request);
+    public Task<VehicleModelResponse?> UpdateAsync(Guid id, VehicleModelRequest request);
 
     /// <summary>
-    /// Deletes a vehicle model record by identifier
+    /// Deletes a vehicle model record from the system
     /// </summary>
-    /// <param name="id">The unique identifier of the vehicle model to delete</param>
-    /// <returns>True if deletion was successful, otherwise false</returns>
     public Task<bool> DeleteAsync(Guid id);
 }
