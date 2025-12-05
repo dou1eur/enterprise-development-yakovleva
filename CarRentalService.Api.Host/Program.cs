@@ -3,8 +3,11 @@ using CarRentalService.Infrastructure;
 using CarRentalService.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
+using CarRentalService.ServiceDefaults;
+
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddApplication();
@@ -21,6 +24,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+app.MapDefaultEndpoints();
 
 try
 {

@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarRentalService.AppHost", 
 		{4359DC6F-5C60-647B-0E8C-C42B3E41EDE0} = {4359DC6F-5C60-647B-0E8C-C42B3E41EDE0}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarRentalService.ServiceDefaults", "..\CarRentalService.ServiceDefaults\CarRentalService.ServiceDefaults.csproj", "{CE234E97-C96B-413C-96C7-A7A2C2FC66BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{B8146398-2F67-49E3-B4D9-D21D03C51FCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8146398-2F67-49E3-B4D9-D21D03C51FCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8146398-2F67-49E3-B4D9-D21D03C51FCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE234E97-C96B-413C-96C7-A7A2C2FC66BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE234E97-C96B-413C-96C7-A7A2C2FC66BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE234E97-C96B-413C-96C7-A7A2C2FC66BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE234E97-C96B-413C-96C7-A7A2C2FC66BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
