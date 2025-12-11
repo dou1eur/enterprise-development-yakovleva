@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CarRentalService.Application.Contracts.Common;
+﻿namespace CarRentalService.Application.Contracts.Common;
 
 /// <summary>
 /// Generic collection response DTO

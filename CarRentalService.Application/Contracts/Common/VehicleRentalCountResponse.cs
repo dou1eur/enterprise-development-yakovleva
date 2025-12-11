@@ -1,9 +1,4 @@
 ﻿using CarRentalService.Application.Contracts.Vehicle;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CarRentalService.Application.Contracts.Common;
 

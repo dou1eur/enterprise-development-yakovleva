@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CarRentalService.Application.Contracts.Rental;
+﻿namespace CarRentalService.Application.Contracts.Rental;
 
 /// <summary>
 /// Response DTO for rental information

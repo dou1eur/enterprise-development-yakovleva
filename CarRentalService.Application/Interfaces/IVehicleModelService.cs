@@ -1,8 +1,4 @@
-﻿using CarRentalService.Application.Contracts;
-using CarRentalService.Application.Contracts.VehicleModel;
-using CarRentalService.Domain;
-using System;
-using System.Collections.Generic;
+﻿using CarRentalService.Application.Contracts.VehicleModel;
 
 namespace CarRentalService.Application.Interfaces;
 

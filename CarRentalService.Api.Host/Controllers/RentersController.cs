@@ -1,7 +1,6 @@
 ﻿using CarRentalService.Application.Contracts.Renter;
 using CarRentalService.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace CarRentalService.Api.Host.Controllers;
 
@@ -11,28 +10,28 @@ namespace CarRentalService.Api.Host.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class RentersController : ControllerBase
+public class RentersController(IRenterService renterService, ILogger<RentersController> logger) : ControllerBase
 {
-    private readonly IRenterService _renterService;
-
-    /// <summary>
-    /// Initializes a new instance of the RentersController class
-    /// </summary>
-    /// <param name="renterService">The renter service</param>
-    public RentersController(IRenterService renterService)
-    {
-        _renterService = renterService;
-    }
-
     /// <summary>
     /// Gets all renters
     /// </summary>
     /// <returns>List of all renters</returns>
     [HttpGet]
+    [ProducesResponseType(typeof(List<RenterResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<List<RenterResponse>>> GetAll()
     {
-        var renters = await _renterService.GetAllAsync();
-        return Ok(renters);
+        try
+        {
+            logger.LogInformation("Getting all renters");
+            var renters = await renterService.GetAllAsync();
+            return Ok(renters);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error getting all renters");
+            return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+        }
     }
 
     /// <summary>
@@ -40,11 +39,23 @@ public class RentersController : ControllerBase
     /// </summary>
     /// <param name="id">The renter ID</param>
     /// <returns>The renter if found</returns>
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(RenterResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<RenterResponse>> Get(Guid id)
     {
-        var renter = await _renterService.GetAsync(id);
-        return renter != null ? Ok(renter) : NotFound();
+        try
+        {
+            logger.LogInformation("Getting renter {Id}", id);
+            var renter = await renterService.GetAsync(id);
+            return renter != null ? Ok(renter) : NotFound();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error getting renter {Id}", id);
+            return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+        }
     }
 
     /// <summary>
@@ -53,10 +64,34 @@ public class RentersController : ControllerBase
     /// <param name="request">The renter creation request</param>
     /// <returns>The created renter</returns>
     [HttpPost]
+    [ProducesResponseType(typeof(RenterResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<RenterResponse>> Create([FromBody] RenterRequest request)
     {
-        var result = await _renterService.CreateAsync(request);
-        return CreatedAtAction(nameof(Get), new { id = result.Id }, result);
+        if (!ModelState.IsValid)
+        {
+            logger.LogWarning("Validation failed for {Operation}: {@Errors}",
+                nameof(Create), ModelState.Values.SelectMany(v => v.Errors));
+            return BadRequest("Invalid request data");
+        }
+
+        try
+        {
+            logger.LogInformation("Creating new renter");
+            var result = await renterService.CreateAsync(request);
+            return CreatedAtAction(nameof(Get), new { id = result.Id }, result);
+        }
+        catch (ArgumentException ex)
+        {
+            logger.LogWarning(ex, "Business validation failed for {Operation}", nameof(Create));
+            return BadRequest("Invalid request data");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error creating renter");
+            return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+        }
     }
 
     /// <summary>
@@ -65,11 +100,36 @@ public class RentersController : ControllerBase
     /// <param name="id">The renter ID</param>
     /// <param name="request">The renter update request</param>
     /// <returns>The updated renter</returns>
-    [HttpPut("{id}")]
+    [HttpPut("{id:guid}")]
+    [ProducesResponseType(typeof(RenterResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<RenterResponse>> Update(Guid id, [FromBody] RenterRequest request)
     {
-        var result = await _renterService.UpdateAsync(id, request);
-        return result != null ? Ok(result) : NotFound();
+        if (!ModelState.IsValid)
+        {
+            logger.LogWarning("Validation failed for {Operation}: {@Errors}",
+                nameof(Update), ModelState.Values.SelectMany(v => v.Errors));
+            return BadRequest("Invalid request data");
+        }
+
+        try
+        {
+            logger.LogInformation("Updating renter {Id}", id);
+            var result = await renterService.UpdateAsync(id, request);
+            return result != null ? Ok(result) : NotFound();
+        }
+        catch (ArgumentException ex)
+        {
+            logger.LogWarning(ex, "Business validation failed for {Operation}", nameof(Update));
+            return BadRequest("Invalid request data");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error updating renter {Id}", id);
+            return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+        }
     }
 
     /// <summary>
@@ -77,10 +137,22 @@ public class RentersController : ControllerBase
     /// </summary>
     /// <param name="id">The renter ID</param>
     /// <returns>No content if successful</returns>
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Delete(Guid id)
     {
-        var result = await _renterService.DeleteAsync(id);
-        return result ? NoContent() : NotFound();
+        try
+        {
+            logger.LogInformation("Deleting renter {Id}", id);
+            var result = await renterService.DeleteAsync(id);
+            return result ? NoContent() : NotFound();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error deleting renter {Id}", id);
+            return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+        }
     }
 }

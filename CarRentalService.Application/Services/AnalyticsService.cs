@@ -1,11 +1,7 @@
 ﻿using CarRentalService.Application.Contracts.Common;
 using CarRentalService.Application.Interfaces;
-using CarRentalService.Application.Interfaces.Repositories;
+using CarRentalService.Interfaces.Repositories;
 using CarRentalService.Application.Mappings;
-using CarRentalService.Domain;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace CarRentalService.Application.Services;
 
@@ -13,40 +9,22 @@ namespace CarRentalService.Application.Services;
 /// Service for providing analytical data and reports for the car rental system
 /// Handles complex queries and data aggregation for business intelligence
 /// </summary>
-public class AnalyticsService : IAnalyticsService
+public class AnalyticsService(
+    IRentalRepository rentalRepository,
+    IVehicleRepository vehicleRepository,
+    IRenterRepository renterRepository,
+    IModelGenerationRepository modelGenerationRepository)
+    : IAnalyticsService
 {
-    private readonly IRentalRepository _rentalRepository;
-    private readonly IVehicleRepository _vehicleRepository;
-    private readonly IRenterRepository _renterRepository;
-    private readonly IModelGenerationRepository _modelGenerationRepository;
-    private readonly IVehicleModelRepository _vehicleModelRepository;
-
-    /// <summary>
-    /// Initializes a new instance of AnalyticsService
-    /// </summary>
-    public AnalyticsService(
-        IRentalRepository rentalRepository,
-        IVehicleRepository vehicleRepository,
-        IRenterRepository renterRepository,
-        IModelGenerationRepository modelGenerationRepository,
-        IVehicleModelRepository vehicleModelRepository)
-    {
-        _rentalRepository = rentalRepository;
-        _vehicleRepository = vehicleRepository;
-        _renterRepository = renterRepository;
-        _modelGenerationRepository = modelGenerationRepository;
-        _vehicleModelRepository = vehicleModelRepository;
-    }
-
     /// <summary>
     /// Returns all renters who rented vehicles of a specified model, ordered by full name
     /// </summary>
     public async Task<List<RenterTotalSpentResponse>> GetRentersByVehicleModelAsync(Guid vehicleModelId)
     {
-        var rentals = await _rentalRepository.GetAllAsync();
-        var vehicles = await _vehicleRepository.GetAllAsync();
-        var renters = await _renterRepository.GetAllAsync();
-        var modelGenerations = await _modelGenerationRepository.GetAllAsync();
+        var rentals = await rentalRepository.GetAllAsync();
+        var vehicles = await vehicleRepository.GetAllAsync();
+        var renters = await renterRepository.GetAllAsync();
+        var modelGenerations = await modelGenerationRepository.GetAllAsync();
 
         var result = rentals
             .Where(rental =>
@@ -76,8 +54,8 @@ public class AnalyticsService : IAnalyticsService
     /// </summary>
     public async Task<List<VehicleRentalCountResponse>> GetVehiclesCurrentlyRentedAsync()
     {
-        var rentals = await _rentalRepository.GetAllAsync();
-        var vehicles = await _vehicleRepository.GetAllAsync();
+        var rentals = await rentalRepository.GetAllAsync();
+        var vehicles = await vehicleRepository.GetAllAsync();
 
         var now = DateTime.Now;
         var rentedVehicleIds = rentals
@@ -99,8 +77,8 @@ public class AnalyticsService : IAnalyticsService
     /// </summary>
     public async Task<List<VehicleRentalCountResponse>> GetTopRentedVehiclesAsync(int top = 5)
     {
-        var rentals = await _rentalRepository.GetAllAsync();
-        var vehicles = await _vehicleRepository.GetAllAsync();
+        var rentals = await rentalRepository.GetAllAsync();
+        var vehicles = await vehicleRepository.GetAllAsync();
 
         var result = rentals
             .GroupBy(rental => rental.VehicleId)
@@ -120,8 +98,8 @@ public class AnalyticsService : IAnalyticsService
     /// </summary>
     public async Task<List<VehicleRentalCountResponse>> GetRentalCountPerVehicleAsync()
     {
-        var rentals = await _rentalRepository.GetAllAsync();
-        var vehicles = await _vehicleRepository.GetAllAsync();
+        var rentals = await rentalRepository.GetAllAsync();
+        var vehicles = await vehicleRepository.GetAllAsync();
 
         var result = rentals
             .GroupBy(rental => rental.VehicleId)
@@ -139,8 +117,8 @@ public class AnalyticsService : IAnalyticsService
     /// </summary>
     public async Task<List<RenterTotalSpentResponse>> GetTopRentersByRentalSumAsync(int top = 5)
     {
-        var rentals = await _rentalRepository.GetAllAsync();
-        var renters = await _renterRepository.GetAllAsync();
+        var rentals = await rentalRepository.GetAllAsync();
+        var renters = await renterRepository.GetAllAsync();
 
         var result = rentals
             .GroupBy(rental => rental.RenterId)

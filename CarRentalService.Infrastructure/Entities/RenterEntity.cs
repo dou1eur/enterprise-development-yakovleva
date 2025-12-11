@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CarRentalService.Infrastructure.Entities;
 
@@ -40,7 +35,8 @@ public class RenterEntityConfiguration : IEntityTypeConfiguration<RenterEntity>
             .HasMaxLength(100);
 
         builder.Property(r => r.DateOfBirth)
-            .IsRequired();
+            .IsRequired()
+            .HasColumnType("timestamp without time zone");
 
         builder.HasIndex(r => r.LicenseNumber)
             .IsUnique();

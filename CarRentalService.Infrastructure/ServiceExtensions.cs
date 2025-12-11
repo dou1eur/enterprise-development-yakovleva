@@ -1,5 +1,6 @@
-﻿using CarRentalService.Application.Interfaces.Repositories;
+﻿using CarRentalService.Interfaces.Repositories;
 using CarRentalService.Infrastructure.Data;
+using CarRentalService.Infrastructure.Mappings;
 using CarRentalService.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -17,6 +18,12 @@ public static class ServiceExtensions
 
         services.AddDbContext<CarRentalDbContext>(options =>
             options.UseNpgsql(connectionString));
+
+        services.AddAutoMapper(cfg =>
+        {
+            cfg.AddProfile<DomainToEntityProfile>();
+            cfg.AddProfile<EntityToDomainProfile>();
+        });
 
         services.AddScoped<IModelGenerationRepository, ModelGenerationRepository>();
         services.AddScoped<IRentalRepository, RentalRepository>();

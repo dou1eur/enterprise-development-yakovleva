@@ -1,9 +1,6 @@
 ﻿using CarRentalService.Domain;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace CarRentalService.Application.Interfaces.Repositories;
+namespace CarRentalService.Interfaces.Repositories;
 
 /// <summary>
 /// Repository interface for vehicle entities with specific vehicle operations

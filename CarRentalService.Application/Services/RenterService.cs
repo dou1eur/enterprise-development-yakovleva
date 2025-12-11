@@ -1,11 +1,7 @@
 ﻿using CarRentalService.Application.Contracts.Renter;
 using CarRentalService.Application.Interfaces;
-using CarRentalService.Application.Interfaces.Repositories;
+using CarRentalService.Interfaces.Repositories;
 using CarRentalService.Application.Mappings;
-using CarRentalService.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace CarRentalService.Application.Services;
 
@@ -13,20 +9,8 @@ namespace CarRentalService.Application.Services;
 /// Service for managing renters in the car rental system
 /// Handles all CRUD operations for renter entities
 /// </summary>
-public class RenterService : IRenterService
+public class RenterService(IRenterRepository renterRepository): IRenterService
 {
-    private readonly IRenterRepository _renterRepository;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RenterService"/> class
-    /// </summary>
-    /// <param name="renterRepository">The renter repository for data access</param>
-    /// <exception cref="ArgumentNullException">Thrown when the repository is null</exception>
-    public RenterService(IRenterRepository renterRepository)
-    {
-        _renterRepository = renterRepository ?? throw new ArgumentNullException(nameof(renterRepository));
-    }
-
     /// <summary>
     /// Creates a new renter record in the system
     /// </summary>
@@ -42,7 +26,7 @@ public class RenterService : IRenterService
             throw new ArgumentException("Renter must be at least 18 years old.", nameof(request.DateOfBirth));
 
         var renter = request.ToDomain();
-        var createdRenter = await _renterRepository.AddAsync(renter);
+        var createdRenter = await renterRepository.AddAsync(renter);
 
         return createdRenter.ToResponse();
     }
@@ -54,7 +38,7 @@ public class RenterService : IRenterService
     /// <returns>The renter response if found; otherwise, <c>null</c></returns>
     public async Task<RenterResponse?> GetAsync(Guid id)
     {
-        var renter = await _renterRepository.GetByIdAsync(id);
+        var renter = await renterRepository.GetByIdAsync(id);
         return renter?.ToResponse();
     }
 
@@ -64,7 +48,7 @@ public class RenterService : IRenterService
     /// <returns>A list of all renter responses</returns>
     public async Task<List<RenterResponse>> GetAllAsync()
     {
-        var renters = await _renterRepository.GetAllAsync();
+        var renters = await renterRepository.GetAllAsync();
         return renters.ToResponseList();
     }
 
@@ -80,7 +64,7 @@ public class RenterService : IRenterService
         if (request == null)
             throw new ArgumentNullException(nameof(request));
 
-        var existingRenter = await _renterRepository.GetByIdAsync(id);
+        var existingRenter = await renterRepository.GetByIdAsync(id);
         if (existingRenter == null)
             return null;
 
@@ -91,7 +75,7 @@ public class RenterService : IRenterService
         existingRenter.FullName = request.FullName;
         existingRenter.DateOfBirth = request.DateOfBirth;
 
-        var updatedRenter = await _renterRepository.UpdateAsync(existingRenter);
+        var updatedRenter = await renterRepository.UpdateAsync(existingRenter);
         return updatedRenter.ToResponse();
     }
 
@@ -102,6 +86,6 @@ public class RenterService : IRenterService
     /// <returns><c>true</c> if deletion was successful; otherwise, <c>false</c></returns>
     public async Task<bool> DeleteAsync(Guid id)
     {
-        return await _renterRepository.DeleteAsync(id);
+        return await renterRepository.DeleteAsync(id);
     }
 }

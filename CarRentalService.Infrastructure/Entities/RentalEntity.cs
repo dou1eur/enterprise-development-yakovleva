@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CarRentalService.Infrastructure.Entities;
 
@@ -35,7 +30,8 @@ public class RentalEntityConfiguration : IEntityTypeConfiguration<RentalEntity>
         builder.HasKey(r => r.Id);
 
         builder.Property(r => r.RentStartTime)
-            .IsRequired();
+            .IsRequired()
+            .HasColumnType("timestamp without time zone");
 
         builder.Property(r => r.DurationHours)
             .IsRequired();

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace CarRentalService.Application.Interfaces.Repositories;
+﻿namespace CarRentalService.Interfaces.Repositories;
 
 /// <summary>
 /// Generic repository interface for basic CRUD operations

@@ -1,14 +1,9 @@
-﻿using CarRentalService.Application.Interfaces.Repositories;
+﻿using AutoMapper;
+using CarRentalService.Interfaces.Repositories;
 using CarRentalService.Domain;
 using CarRentalService.Infrastructure.Data;
 using CarRentalService.Infrastructure.Entities;
-using CarRentalService.Infrastructure.Mappings;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CarRentalService.Infrastructure.Repositories;
 
@@ -16,19 +11,12 @@ namespace CarRentalService.Infrastructure.Repositories;
 /// PostgreSQL repository implementation for vehicle entities
 /// Handles data access for vehicles with mapping between domain and entity models
 /// </summary>
-public class VehicleRepository : CarRentalServiceBaseRepository<Vehicle, Guid>, IVehicleRepository
+public class VehicleRepository(
+    CarRentalDbContext dbContext,
+    IMapper mapper)
+    : CarRentalServiceBaseRepository<VehicleEntity, Vehicle, Guid>(dbContext, mapper),
+      IVehicleRepository
 {
-    private new readonly CarRentalDbContext _dbContext;
-
-    /// <summary>
-    /// Initializes a new instance of VehicleRepository
-    /// </summary>
-    /// <param name="dbContext">The database context</param>
-    public VehicleRepository(CarRentalDbContext dbContext) : base(dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
     /// <summary>
     /// Retrieves a vehicle by its license plate number
     /// </summary>
@@ -40,7 +28,7 @@ public class VehicleRepository : CarRentalServiceBaseRepository<Vehicle, Guid>, 
             .AsNoTracking()
             .FirstOrDefaultAsync(v => v.LicensePlate == licensePlate);
 
-        return entity?.ToDomain();
+        return entity == null ? null : _mapper.Map<Vehicle>(entity);
     }
 
     /// <summary>
@@ -52,10 +40,11 @@ public class VehicleRepository : CarRentalServiceBaseRepository<Vehicle, Guid>, 
     {
         var entities = await _dbContext.Vehicles
             .AsNoTracking()
+            .Include(v => v.ModelGeneration)
             .Where(v => v.ModelGeneration.VehicleModelId == modelId)
             .ToListAsync();
 
-        return entities.Select(e => e.ToDomain()).ToList();
+        return _mapper.Map<List<Vehicle>>(entities);
     }
 
     /// <summary>
@@ -69,7 +58,7 @@ public class VehicleRepository : CarRentalServiceBaseRepository<Vehicle, Guid>, 
             .AsNoTracking()
             .FirstOrDefaultAsync(v => v.Id == id);
 
-        return entity?.ToDomain();
+        return entity == null ? null : _mapper.Map<Vehicle>(entity);
     }
 
     /// <summary>
@@ -82,49 +71,7 @@ public class VehicleRepository : CarRentalServiceBaseRepository<Vehicle, Guid>, 
             .AsNoTracking()
             .ToListAsync();
 
-        return entities.Select(e => e.ToDomain()).ToList();
-    }
-
-    /// <summary>
-    /// Adds a new entity to the repository
-    /// </summary>
-    /// <param name="entity">The entity to add</param>
-    /// <returns>The added entity</returns>
-    public override async Task<Vehicle> AddAsync(Vehicle entity)
-    {
-        var dbEntity = entity.ToEntity();
-        var result = await _dbContext.Vehicles.AddAsync(dbEntity);
-        await _dbContext.SaveChangesAsync();
-        return result.Entity.ToDomain();
-    }
-
-    /// <summary>
-    /// Updates an existing entity in the repository
-    /// </summary>
-    /// <param name="entity">The entity with updated data</param>
-    /// <returns>The updated entity</returns>
-    public override async Task<Vehicle> UpdateAsync(Vehicle entity)
-    {
-        var dbEntity = entity.ToEntity();
-        var result = _dbContext.Vehicles.Update(dbEntity);
-        await _dbContext.SaveChangesAsync();
-        return result.Entity.ToDomain();
-    }
-
-    /// <summary>
-    /// Deletes an entity by its identifier
-    /// </summary>
-    /// <param name="id">The entity identifier</param>
-    /// <returns>True if deletion was successful, otherwise false</returns>
-    public override async Task<bool> DeleteAsync(Guid id)
-    {
-        var entity = await _dbContext.Vehicles.FindAsync(id);
-        if (entity == null)
-            return false;
-
-        _dbContext.Vehicles.Remove(entity);
-        await _dbContext.SaveChangesAsync();
-        return true;
+        return _mapper.Map<List<Vehicle>>(entities);
     }
 
     /// <summary>

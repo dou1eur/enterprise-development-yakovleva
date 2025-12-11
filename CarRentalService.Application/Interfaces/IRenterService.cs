@@ -1,6 +1,4 @@
 ﻿using CarRentalService.Application.Contracts.Renter;
-using System;
-using System.Collections.Generic;
 
 namespace CarRentalService.Application.Interfaces;
 

@@ -1,14 +1,9 @@
-﻿using CarRentalService.Application.Interfaces.Repositories;
+﻿using AutoMapper;
+using CarRentalService.Interfaces.Repositories;
 using CarRentalService.Domain;
 using CarRentalService.Infrastructure.Data;
 using CarRentalService.Infrastructure.Entities;
-using CarRentalService.Infrastructure.Mappings;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CarRentalService.Infrastructure.Repositories;
 
@@ -16,19 +11,12 @@ namespace CarRentalService.Infrastructure.Repositories;
 /// PostgreSQL repository implementation for renter entities
 /// Handles data access for renters with mapping between domain and entity models
 /// </summary>
-public class RenterRepository : CarRentalServiceBaseRepository<Renter, Guid>, IRenterRepository
+public class RenterRepository(
+    CarRentalDbContext dbContext,
+    IMapper mapper)
+    : CarRentalServiceBaseRepository<RenterEntity, Renter, Guid>(dbContext, mapper),
+      IRenterRepository
 {
-    private new readonly CarRentalDbContext _dbContext;
-
-    /// <summary>
-    /// Initializes a new instance of RenterRepository
-    /// </summary>
-    /// <param name="dbContext">The database context</param>
-    public RenterRepository(CarRentalDbContext dbContext) : base(dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
     /// <summary>
     /// Retrieves a renter by their driver's license number
     /// </summary>
@@ -40,7 +28,7 @@ public class RenterRepository : CarRentalServiceBaseRepository<Renter, Guid>, IR
             .AsNoTracking()
             .FirstOrDefaultAsync(r => r.LicenseNumber == licenseNumber);
 
-        return entity?.ToDomain();
+        return entity == null ? null : _mapper.Map<Renter>(entity);
     }
 
     /// <summary>
@@ -54,7 +42,7 @@ public class RenterRepository : CarRentalServiceBaseRepository<Renter, Guid>, IR
             .AsNoTracking()
             .FirstOrDefaultAsync(r => r.Id == id);
 
-        return entity?.ToDomain();
+        return entity == null ? null : _mapper.Map<Renter>(entity);
     }
 
     /// <summary>
@@ -67,49 +55,7 @@ public class RenterRepository : CarRentalServiceBaseRepository<Renter, Guid>, IR
             .AsNoTracking()
             .ToListAsync();
 
-        return entities.Select(e => e.ToDomain()).ToList();
-    }
-
-    /// <summary>
-    /// Adds a new entity to the repository
-    /// </summary>
-    /// <param name="entity">The entity to add</param>
-    /// <returns>The added entity</returns>
-    public override async Task<Renter> AddAsync(Renter entity)
-    {
-        var dbEntity = entity.ToEntity();
-        var result = await _dbContext.Renters.AddAsync(dbEntity);
-        await _dbContext.SaveChangesAsync();
-        return result.Entity.ToDomain();
-    }
-
-    /// <summary>
-    /// Updates an existing entity in the repository
-    /// </summary>
-    /// <param name="entity">The entity with updated data</param>
-    /// <returns>The updated entity</returns>
-    public override async Task<Renter> UpdateAsync(Renter entity)
-    {
-        var dbEntity = entity.ToEntity();
-        var result = _dbContext.Renters.Update(dbEntity);
-        await _dbContext.SaveChangesAsync();
-        return result.Entity.ToDomain();
-    }
-
-    /// <summary>
-    /// Deletes an entity by its identifier
-    /// </summary>
-    /// <param name="id">The entity identifier</param>
-    /// <returns>True if deletion was successful, otherwise false</returns>
-    public override async Task<bool> DeleteAsync(Guid id)
-    {
-        var entity = await _dbContext.Renters.FindAsync(id);
-        if (entity == null)
-            return false;
-
-        _dbContext.Renters.Remove(entity);
-        await _dbContext.SaveChangesAsync();
-        return true;
+        return _mapper.Map<List<Renter>>(entities);
     }
 
     /// <summary>

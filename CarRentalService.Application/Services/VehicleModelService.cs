@@ -1,12 +1,8 @@
 ﻿using CarRentalService.Application.Contracts;
 using CarRentalService.Application.Contracts.VehicleModel;
 using CarRentalService.Application.Interfaces;
-using CarRentalService.Application.Interfaces.Repositories;
+using CarRentalService.Interfaces.Repositories;
 using CarRentalService.Application.Mappings;
-using CarRentalService.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace CarRentalService.Application.Services;
 
@@ -14,20 +10,8 @@ namespace CarRentalService.Application.Services;
 /// Service for managing vehicle models in the car rental system
 /// Handles all CRUD operations for vehicle model entities
 /// </summary>
-public class VehicleModelService : IVehicleModelService
+public class VehicleModelService(IVehicleModelRepository vehicleModelRepository) : IVehicleModelService
 {
-    private readonly IVehicleModelRepository _vehicleModelRepository;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="VehicleModelService"/> class
-    /// </summary>
-    /// <param name="vehicleModelRepository">The vehicle model repository for data access</param>
-    /// <exception cref="ArgumentNullException">Thrown when the repository is null</exception>
-    public VehicleModelService(IVehicleModelRepository vehicleModelRepository)
-    {
-        _vehicleModelRepository = vehicleModelRepository ?? throw new ArgumentNullException(nameof(vehicleModelRepository));
-    }
-
     /// <summary>
     /// Creates a new vehicle model record in the system
     /// </summary>
@@ -37,7 +21,7 @@ public class VehicleModelService : IVehicleModelService
             throw new ArgumentNullException(nameof(request));
 
         var vehicleModel = request.ToDomain();
-        var createdVehicleModel = await _vehicleModelRepository.AddAsync(vehicleModel);
+        var createdVehicleModel = await vehicleModelRepository.AddAsync(vehicleModel);
 
         return createdVehicleModel.ToResponse();
     }
@@ -47,7 +31,7 @@ public class VehicleModelService : IVehicleModelService
     /// </summary>
     public async Task<VehicleModelResponse?> GetAsync(Guid id)
     {
-        var vehicleModel = await _vehicleModelRepository.GetByIdAsync(id);
+        var vehicleModel = await vehicleModelRepository.GetByIdAsync(id);
         return vehicleModel?.ToResponse();
     }
 
@@ -56,7 +40,7 @@ public class VehicleModelService : IVehicleModelService
     /// </summary>
     public async Task<List<VehicleModelResponse>> GetAllAsync()
     {
-        var vehicleModels = await _vehicleModelRepository.GetAllAsync();
+        var vehicleModels = await vehicleModelRepository.GetAllAsync();
         return vehicleModels.ToResponseList();
     }
 
@@ -68,7 +52,7 @@ public class VehicleModelService : IVehicleModelService
         if (request == null)
             throw new ArgumentNullException(nameof(request));
 
-        var existingVehicleModel = await _vehicleModelRepository.GetByIdAsync(id);
+        var existingVehicleModel = await vehicleModelRepository.GetByIdAsync(id);
         if (existingVehicleModel == null)
             return null;
 
@@ -78,7 +62,7 @@ public class VehicleModelService : IVehicleModelService
         existingVehicleModel.BodyType = request.BodyType;
         existingVehicleModel.VehicleClass = request.VehicleClass;
 
-        var updatedVehicleModel = await _vehicleModelRepository.UpdateAsync(existingVehicleModel);
+        var updatedVehicleModel = await vehicleModelRepository.UpdateAsync(existingVehicleModel);
         return updatedVehicleModel.ToResponse();
     }
 
@@ -87,6 +71,6 @@ public class VehicleModelService : IVehicleModelService
     /// </summary>
     public async Task<bool> DeleteAsync(Guid id)
     {
-        return await _vehicleModelRepository.DeleteAsync(id);
+        return await vehicleModelRepository.DeleteAsync(id);
     }
 }

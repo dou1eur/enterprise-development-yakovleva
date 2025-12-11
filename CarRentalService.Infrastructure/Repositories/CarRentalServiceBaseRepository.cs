@@ -1,11 +1,7 @@
-﻿using CarRentalService.Infrastructure.Data;
-using CarRentalService.Application.Interfaces.Repositories;
+﻿using AutoMapper;
+using CarRentalService.Infrastructure.Data;
+using CarRentalService.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CarRentalService.Infrastructure.Repositories;
 
@@ -14,65 +10,65 @@ namespace CarRentalService.Infrastructure.Repositories;
 /// Provides common CRUD operations for all entity types
 /// </summary>
 /// <typeparam name="TEntity">The type of entity</typeparam>
+/// <typeparam name="TDomain">The type of domain model</typeparam>
 /// <typeparam name="TId">The type of entity identifier</typeparam>
-public abstract class CarRentalServiceBaseRepository<TEntity, TId> : IRepository<TEntity, TId>
+public abstract class CarRentalServiceBaseRepository<TEntity, TDomain, TId>(
+    CarRentalDbContext dbContext,
+    IMapper mapper)
+    : IRepository<TDomain, TId>
     where TEntity : class
+    where TDomain : class
     where TId : struct
 {
-    protected readonly CarRentalDbContext _dbContext;
-    protected readonly DbSet<TEntity> _dbSet;
-
-    /// <summary>
-    /// Initializes a new instance of CarRentalServiceBaseRepository
-    /// </summary>
-    /// <param name="dbContext">The database context</param>
-    protected CarRentalServiceBaseRepository(CarRentalDbContext dbContext)
-    {
-        _dbContext = dbContext;
-        _dbSet = dbContext.Set<TEntity>();
-    }
+    protected readonly CarRentalDbContext _dbContext = dbContext;
+    protected readonly IMapper _mapper = mapper;
+    protected readonly DbSet<TEntity> _dbSet = dbContext.Set<TEntity>();
 
     /// <summary>
     /// Retrieves an entity by its unique identifier
     /// </summary>
     /// <param name="id">The entity identifier</param>
     /// <returns>The entity if found, otherwise null</returns>
-    public virtual async Task<TEntity?> GetByIdAsync(TId id)
+    public virtual async Task<TDomain?> GetByIdAsync(TId id)
     {
-        return await _dbSet.FindAsync(id);
+        var entity = await _dbSet.FindAsync(id);
+        return entity == null ? null : _mapper.Map<TDomain>(entity);
     }
 
     /// <summary>
     /// Retrieves all entities
     /// </summary>
     /// <returns>List of all entities</returns>
-    public virtual async Task<List<TEntity>> GetAllAsync()
+    public virtual async Task<List<TDomain>> GetAllAsync()
     {
-        return await _dbSet.AsNoTracking().ToListAsync();
+        var entities = await _dbSet.AsNoTracking().ToListAsync();
+        return _mapper.Map<List<TDomain>>(entities);
     }
 
     /// <summary>
     /// Adds a new entity to the repository
     /// </summary>
-    /// <param name="entity">The entity to add</param>
-    /// <returns>The added entity</returns>
-    public virtual async Task<TEntity> AddAsync(TEntity entity)
+    /// <param name="domain">The domain entity to add</param>
+    /// <returns>The added domain entity</returns>
+    public virtual async Task<TDomain> AddAsync(TDomain domain)
     {
+        var entity = _mapper.Map<TEntity>(domain);
         var result = await _dbSet.AddAsync(entity);
         await _dbContext.SaveChangesAsync();
-        return result.Entity;
+        return _mapper.Map<TDomain>(result.Entity);
     }
 
     /// <summary>
     /// Updates an existing entity in the repository
     /// </summary>
-    /// <param name="entity">The entity with updated data</param>
-    /// <returns>The updated entity</returns>
-    public virtual async Task<TEntity> UpdateAsync(TEntity entity)
+    /// <param name="domain">The domain entity with updated data</param>
+    /// <returns>The updated domain entity</returns>
+    public virtual async Task<TDomain> UpdateAsync(TDomain domain)
     {
+        var entity = _mapper.Map<TEntity>(domain);
         var result = _dbSet.Update(entity);
         await _dbContext.SaveChangesAsync();
-        return result.Entity;
+        return _mapper.Map<TDomain>(result.Entity);
     }
 
     /// <summary>
@@ -86,7 +82,8 @@ public abstract class CarRentalServiceBaseRepository<TEntity, TId> : IRepository
         if (entity == null)
             return false;
 
-        _dbSet.Remove(entity);
+        var dbEntity = _mapper.Map<TEntity>(entity);
+        _dbSet.Remove(dbEntity);
         await _dbContext.SaveChangesAsync();
         return true;
     }

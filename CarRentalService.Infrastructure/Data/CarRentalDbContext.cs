@@ -1,31 +1,18 @@
 ﻿using CarRentalService.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CarRentalService.Infrastructure.Data;
 
 /// <summary>
 /// DbContext for CarRentalService using PostgreSQL
 /// </summary>
-public class CarRentalDbContext : DbContext
+public class CarRentalDbContext(DbContextOptions<CarRentalDbContext> options) : DbContext(options)
 {
-    public CarRentalDbContext(DbContextOptions<CarRentalDbContext> options) : base(options)
-    {
-    }
-
-    protected CarRentalDbContext() : base()
-    {
-    }
-
-    public DbSet<RenterEntity> Renters { get; set; }
-    public DbSet<VehicleEntity> Vehicles { get; set; }
-    public DbSet<VehicleModelEntity> VehicleModels { get; set; }
-    public DbSet<ModelGenerationEntity> ModelGenerations { get; set; }
-    public DbSet<RentalEntity> Rentals { get; set; }
+    public DbSet<RenterEntity> Renters { get; set; } = null!;
+    public DbSet<VehicleEntity> Vehicles { get; set; } = null!;
+    public DbSet<VehicleModelEntity> VehicleModels { get; set; } = null!;
+    public DbSet<ModelGenerationEntity> ModelGenerations { get; set; } = null!;
+    public DbSet<RentalEntity> Rentals { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,7 +1,4 @@
-﻿using CarRentalService.Application.Contracts;
-using CarRentalService.Application.Contracts.Rental;
-using System;
-using System.Collections.Generic;
+﻿using CarRentalService.Application.Contracts.Rental;
 
 namespace CarRentalService.Application.Interfaces;
 

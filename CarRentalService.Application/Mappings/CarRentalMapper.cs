@@ -5,11 +5,6 @@ using CarRentalService.Application.Contracts.Renter;
 using CarRentalService.Application.Contracts.Vehicle;
 using CarRentalService.Application.Contracts.VehicleModel;
 using CarRentalService.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CarRentalService.Application.Mappings;
 

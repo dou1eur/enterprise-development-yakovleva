@@ -1,7 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
 
 namespace CarRentalService.Api.Host.Controllers;
 
@@ -16,6 +13,9 @@ namespace CarRentalService.Api.Host.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public abstract class CrudControllerBase<TDto, TCreateDto, TUpdateDto, TId> : ControllerBase
+    where TDto : class
+    where TCreateDto : class
+    where TUpdateDto : class
     where TId : struct
 {
     protected readonly ILogger<CrudControllerBase<TDto, TCreateDto, TUpdateDto, TId>> _logger;
@@ -70,8 +70,8 @@ public abstract class CrudControllerBase<TDto, TCreateDto, TUpdateDto, TId> : Co
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public virtual async Task<ActionResult<TDto>> Create(TCreateDto request)
-        => await ExecuteWithLoggingAsync(nameof(Create), async () =>
+    public virtual async Task<ActionResult<TDto>> Create([FromBody] TCreateDto request)
+        => await ExecuteWithLoggingAndValidationAsync(nameof(Create), request, async () =>
         {
             try
             {
@@ -80,7 +80,8 @@ public abstract class CrudControllerBase<TDto, TCreateDto, TUpdateDto, TId> : Co
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogWarning(ex, "Business validation failed for {Operation}", nameof(Create));
+                return BadRequest("Invalid request data");
             }
         });
 
@@ -95,8 +96,8 @@ public abstract class CrudControllerBase<TDto, TCreateDto, TUpdateDto, TId> : Co
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public virtual async Task<ActionResult<TDto>> Update(TId id, TUpdateDto request)
-        => await ExecuteWithLoggingAsync(nameof(Update), async () =>
+    public virtual async Task<ActionResult<TDto>> Update(TId id, [FromBody] TUpdateDto request)
+        => await ExecuteWithLoggingAndValidationAsync(nameof(Update), request, async () =>
         {
             try
             {
@@ -107,7 +108,8 @@ public abstract class CrudControllerBase<TDto, TCreateDto, TUpdateDto, TId> : Co
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogWarning(ex, "Business validation failed for {Operation}", nameof(Update));
+                return BadRequest("Invalid request data");
             }
         });
 
@@ -153,6 +155,35 @@ public abstract class CrudControllerBase<TDto, TCreateDto, TUpdateDto, TId> : Co
     {
         try
         {
+            _logger.LogInformation("Executing {Operation}", operationName);
+            return await action();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error executing {Operation}", operationName);
+            return StatusCode(500, "Internal server error");
+        }
+    }
+
+    /// <summary>
+    /// Executes an action with logging, validation and error handling
+    /// </summary>
+    /// <param name="operationName">The name of the operation</param>
+    /// <param name="request">The request object to validate</param>
+    /// <param name="action">The action to execute</param>
+    /// <returns>The action result</returns>
+    protected async Task<ActionResult> ExecuteWithLoggingAndValidationAsync<TRequest>(string operationName, TRequest request, Func<Task<ActionResult>> action)
+        where TRequest : class
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Validation failed for {Operation}: {@Errors}",
+                    operationName, ModelState.Values.SelectMany(v => v.Errors));
+                return BadRequest("Invalid request data");
+            }
+
             _logger.LogInformation("Executing {Operation}", operationName);
             return await action();
         }

@@ -1,7 +1,6 @@
 using CarRentalService.Application;
 using CarRentalService.Infrastructure;
 using CarRentalService.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 using CarRentalService.ServiceDefaults;
 
@@ -26,21 +25,21 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 app.MapDefaultEndpoints();
 
-try
-{
-    using var scope = app.Services.CreateScope();
-    var context = scope.ServiceProvider.GetRequiredService<CarRentalDbContext>();
-    await context.Database.MigrateAsync();
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"Database error: {ex.Message}");
-}
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<CarRentalDbContext>();
+
+    await Task.Delay(5000);
+    await context.Database.EnsureCreatedAsync();
+
+    if (!context.VehicleModels.Any())
+        await DataSeeder.SeedAsync(context);
 }
 
 app.UseHttpsRedirection();
