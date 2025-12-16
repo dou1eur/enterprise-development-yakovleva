@@ -10,27 +10,27 @@ public class CarRentalFixture
     /// <summary>
     /// Collection of vehicle models
     /// </summary>
-    public List<VehicleModel> Models { get; } = new();
+    public List<VehicleModel> Models { get; } = [];
 
     /// <summary>
     /// Collection of vehicle generations
     /// </summary>
-    public List<ModelGeneration> Generations { get; } = new();
+    public List<ModelGeneration> Generations { get; } = [];
 
     /// <summary>
     /// Collection of specific vehicles
     /// </summary>
-    public List<Vehicle> Vehicles { get; } = new();
+    public List<Vehicle> Vehicles { get; } = [];
 
     /// <summary>
     /// Collection of renters
     /// </summary>
-    public List<Renter> Renters { get; } = new();
+    public List<Renter> Renters { get; } = [];
 
     /// <summary>
     /// Collection of rental transactions
     /// </summary>
-    public List<Rental> Rentals { get; } = new();
+    public List<Rental> Rentals { get; } = [];
 
     private VehicleModel? ChevroletCobaltModel { get; set; }
     private VehicleModel? ToyotaCamryModel { get; set; }

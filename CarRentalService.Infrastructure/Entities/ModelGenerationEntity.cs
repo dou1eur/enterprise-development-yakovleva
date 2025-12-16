@@ -16,7 +16,7 @@ public class ModelGenerationEntity
     public decimal RentalPricePerHour { get; set; }
     public Guid VehicleModelId { get; set; }
     public VehicleModelEntity VehicleModel { get; set; } = null!;
-    public ICollection<VehicleEntity> Vehicles { get; set; } = new List<VehicleEntity>();
+    public ICollection<VehicleEntity> Vehicles { get; set; } = [];
 }
 
 /// <summary>

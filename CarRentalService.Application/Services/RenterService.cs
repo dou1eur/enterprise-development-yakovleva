@@ -19,11 +19,10 @@ public class RenterService(IRenterRepository renterRepository): IRenterService
     /// <exception cref="ArgumentNullException">Thrown when the request is null</exception>
     public async Task<RenterResponse> CreateAsync(RenterRequest request)
     {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
 
         if (request.DateOfBirth > DateTime.UtcNow.AddYears(-18))
-            throw new ArgumentException("Renter must be at least 18 years old.", nameof(request.DateOfBirth));
+            throw new InvalidOperationException("Renter must be at least 18 years old.");
 
         var renter = request.ToDomain();
         var createdRenter = await renterRepository.AddAsync(renter);
@@ -61,15 +60,14 @@ public class RenterService(IRenterRepository renterRepository): IRenterService
     /// <exception cref="ArgumentNullException">Thrown when the request is null</exception>
     public async Task<RenterResponse?> UpdateAsync(Guid id, RenterRequest request)
     {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
 
         var existingRenter = await renterRepository.GetByIdAsync(id);
-        if (existingRenter == null)
+        if (existingRenter is null)
             return null;
 
         if (request.DateOfBirth > DateTime.UtcNow.AddYears(-18))
-            throw new ArgumentException("Renter must be at least 18 years old.", nameof(request.DateOfBirth));
+            throw new InvalidOperationException("Renter must be at least 18 years old.");
 
         existingRenter.LicenseNumber = request.LicenseNumber;
         existingRenter.FullName = request.FullName;

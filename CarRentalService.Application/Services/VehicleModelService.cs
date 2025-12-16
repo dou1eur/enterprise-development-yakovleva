@@ -17,8 +17,7 @@ public class VehicleModelService(IVehicleModelRepository vehicleModelRepository)
     /// </summary>
     public async Task<VehicleModelResponse> CreateAsync(VehicleModelRequest request)
     {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
 
         var vehicleModel = request.ToDomain();
         var createdVehicleModel = await vehicleModelRepository.AddAsync(vehicleModel);
@@ -49,8 +48,7 @@ public class VehicleModelService(IVehicleModelRepository vehicleModelRepository)
     /// </summary>
     public async Task<VehicleModelResponse?> UpdateAsync(Guid id, VehicleModelRequest request)
     {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
 
         var existingVehicleModel = await vehicleModelRepository.GetByIdAsync(id);
         if (existingVehicleModel == null)

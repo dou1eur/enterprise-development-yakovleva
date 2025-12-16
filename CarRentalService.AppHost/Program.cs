@@ -9,6 +9,7 @@ var postgres = builder.AddPostgres("postgres", password: password)
 var carRentalDb = postgres.AddDatabase(dbName);
 
 builder.AddProject<Projects.CarRentalService_Api_Host>("api")
-    .WithReference(carRentalDb, "Database");
+    .WithReference(carRentalDb, "Database")
+    .WaitFor(carRentalDb);
 
 builder.Build().Run();

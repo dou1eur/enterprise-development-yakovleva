@@ -13,7 +13,7 @@ public class VehicleEntity
     public string Color { get; set; } = string.Empty;
     public Guid ModelGenerationId { get; set; }
     public ModelGenerationEntity ModelGeneration { get; set; } = null!;
-    public ICollection<RentalEntity> Rentals { get; set; } = new List<RentalEntity>();
+    public ICollection<RentalEntity> Rentals { get; set; } = [];
 }
 
 /// <summary>

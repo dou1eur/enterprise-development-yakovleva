@@ -12,23 +12,13 @@ namespace CarRentalService.Api.Host.Controllers;
 /// <typeparam name="TId">The identifier type</typeparam>
 [ApiController]
 [Route("api/[controller]")]
-public abstract class CrudControllerBase<TDto, TCreateDto, TUpdateDto, TId> : ControllerBase
+public abstract class CrudControllerBase<TDto, TCreateDto, TUpdateDto, TId>(
+    ILogger<CrudControllerBase<TDto, TCreateDto, TUpdateDto, TId>> logger) : ControllerBase
     where TDto : class
     where TCreateDto : class
     where TUpdateDto : class
     where TId : struct
 {
-    protected readonly ILogger<CrudControllerBase<TDto, TCreateDto, TUpdateDto, TId>> _logger;
-
-    /// <summary>
-    /// Initializes a new instance of the CrudControllerBase class
-    /// </summary>
-    /// <param name="logger">The logger instance</param>
-    protected CrudControllerBase(ILogger<CrudControllerBase<TDto, TCreateDto, TUpdateDto, TId>> logger)
-    {
-        _logger = logger;
-    }
-
     /// <summary>
     /// Retrieves all entities
     /// </summary>
@@ -71,7 +61,7 @@ public abstract class CrudControllerBase<TDto, TCreateDto, TUpdateDto, TId> : Co
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public virtual async Task<ActionResult<TDto>> Create([FromBody] TCreateDto request)
-        => await ExecuteWithLoggingAndValidationAsync(nameof(Create), request, async () =>
+        => await ExecuteWithLoggingAndValidationAsync<TCreateDto>(nameof(Create), async () =>
         {
             try
             {
@@ -80,7 +70,7 @@ public abstract class CrudControllerBase<TDto, TCreateDto, TUpdateDto, TId> : Co
             }
             catch (ArgumentException ex)
             {
-                _logger.LogWarning(ex, "Business validation failed for {Operation}", nameof(Create));
+                logger.LogWarning(ex, "Business validation failed for {Operation}", nameof(Create));
                 return BadRequest("Invalid request data");
             }
         });
@@ -97,7 +87,7 @@ public abstract class CrudControllerBase<TDto, TCreateDto, TUpdateDto, TId> : Co
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public virtual async Task<ActionResult<TDto>> Update(TId id, [FromBody] TUpdateDto request)
-        => await ExecuteWithLoggingAndValidationAsync(nameof(Update), request, async () =>
+        => await ExecuteWithLoggingAndValidationAsync<TUpdateDto>(nameof(Update), async () =>
         {
             try
             {
@@ -108,7 +98,7 @@ public abstract class CrudControllerBase<TDto, TCreateDto, TUpdateDto, TId> : Co
             }
             catch (ArgumentException ex)
             {
-                _logger.LogWarning(ex, "Business validation failed for {Operation}", nameof(Update));
+                logger.LogWarning(ex, "Business validation failed for {Operation}", nameof(Update));
                 return BadRequest("Invalid request data");
             }
         });
@@ -155,12 +145,12 @@ public abstract class CrudControllerBase<TDto, TCreateDto, TUpdateDto, TId> : Co
     {
         try
         {
-            _logger.LogInformation("Executing {Operation}", operationName);
+            logger.LogInformation("Executing {Operation}", operationName);
             return await action();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error executing {Operation}", operationName);
+            logger.LogError(ex, "Error executing {Operation}", operationName);
             return StatusCode(500, "Internal server error");
         }
     }
@@ -172,24 +162,24 @@ public abstract class CrudControllerBase<TDto, TCreateDto, TUpdateDto, TId> : Co
     /// <param name="request">The request object to validate</param>
     /// <param name="action">The action to execute</param>
     /// <returns>The action result</returns>
-    protected async Task<ActionResult> ExecuteWithLoggingAndValidationAsync<TRequest>(string operationName, TRequest request, Func<Task<ActionResult>> action)
+    protected async Task<ActionResult> ExecuteWithLoggingAndValidationAsync<TRequest>(string operationName, Func<Task<ActionResult>> action)
         where TRequest : class
     {
         try
         {
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning("Validation failed for {Operation}: {@Errors}",
+                logger.LogWarning("Validation failed for {Operation}: {@Errors}",
                     operationName, ModelState.Values.SelectMany(v => v.Errors));
                 return BadRequest("Invalid request data");
             }
 
-            _logger.LogInformation("Executing {Operation}", operationName);
+            logger.LogInformation("Executing {Operation}", operationName);
             return await action();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error executing {Operation}", operationName);
+            logger.LogError(ex, "Error executing {Operation}", operationName);
             return StatusCode(500, "Internal server error");
         }
     }

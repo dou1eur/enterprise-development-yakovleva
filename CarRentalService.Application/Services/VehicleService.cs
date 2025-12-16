@@ -16,17 +16,18 @@ public class VehicleService(IVehicleRepository vehicleRepository, IModelGenerati
     /// </summary>
     public async Task<VehicleResponse> CreateAsync(VehicleRequest request)
     {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
 
         var modelGeneration = await modelGenerationRepository.GetByIdAsync(request.ModelGenerationId);
-        if (modelGeneration == null)
-            throw new ArgumentException($"Model generation with ID {request.ModelGenerationId} does not exist", nameof(request.ModelGenerationId));
+        if (modelGeneration is not null)
+        {
+            var vehicle = request.ToDomain();
+            var createdVehicle = await vehicleRepository.AddAsync(vehicle);
 
-        var vehicle = request.ToDomain();
-        var createdVehicle = await vehicleRepository.AddAsync(vehicle);
+            return createdVehicle.ToResponse();
+        }
 
-        return createdVehicle.ToResponse();
+        throw new InvalidOperationException($"Model generation with ID {request.ModelGenerationId} does not exist");
     }
 
     /// <summary>
@@ -52,23 +53,28 @@ public class VehicleService(IVehicleRepository vehicleRepository, IModelGenerati
     /// </summary>
     public async Task<VehicleResponse?> UpdateAsync(Guid id, VehicleRequest request)
     {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
 
         var existingVehicle = await vehicleRepository.GetByIdAsync(id);
-        if (existingVehicle == null)
+
+        if (existingVehicle is null)
+        {
             return null;
+        }
 
         var modelGeneration = await modelGenerationRepository.GetByIdAsync(request.ModelGenerationId);
-        if (modelGeneration == null)
-            throw new ArgumentException($"Model generation with ID {request.ModelGenerationId} does not exist", nameof(request.ModelGenerationId));
 
-        existingVehicle.LicensePlate = request.LicensePlate;
-        existingVehicle.Color = request.Color;
-        existingVehicle.GenerationId = request.ModelGenerationId;
+        if (modelGeneration is not null)
+        {
+            existingVehicle.LicensePlate = request.LicensePlate;
+            existingVehicle.Color = request.Color;
+            existingVehicle.GenerationId = request.ModelGenerationId;
 
-        var updatedVehicle = await vehicleRepository.UpdateAsync(existingVehicle);
-        return updatedVehicle.ToResponse();
+            var updatedVehicle = await vehicleRepository.UpdateAsync(existingVehicle);
+            return updatedVehicle.ToResponse();
+        }
+
+        throw new InvalidOperationException($"Model generation with ID {request.ModelGenerationId} does not exist");
     }
 
     /// <summary>

@@ -15,9 +15,7 @@ public class VehicleModelEntity
     public int SeatCount { get; set; }
     public BodyType BodyType { get; set; }
     public VehicleClass VehicleClass { get; set; }
-
-    // Navigation properties
-    public ICollection<ModelGenerationEntity> ModelGenerations { get; set; } = new List<ModelGenerationEntity>();
+    public ICollection<ModelGenerationEntity> ModelGenerations { get; set; } = [];
 }
 
 /// <summary>

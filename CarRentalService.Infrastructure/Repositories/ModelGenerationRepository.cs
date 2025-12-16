@@ -47,41 +47,4 @@ public class ModelGenerationRepository(
 
         return _mapper.Map<List<ModelGeneration>>(entities);
     }
-
-    /// <summary>
-    /// Retrieves an entity by its unique identifier
-    /// </summary>
-    /// <param name="id">The entity identifier</param>
-    /// <returns>The entity if found, otherwise null</returns>
-    public override async Task<ModelGeneration?> GetByIdAsync(Guid id)
-    {
-        var entity = await _dbContext.ModelGenerations
-            .AsNoTracking()
-            .FirstOrDefaultAsync(mg => mg.Id == id);
-
-        return entity == null ? null : _mapper.Map<ModelGeneration>(entity);
-    }
-
-    /// <summary>
-    /// Retrieves all entities
-    /// </summary>
-    /// <returns>List of all entities</returns>
-    public override async Task<List<ModelGeneration>> GetAllAsync()
-    {
-        var entities = await _dbContext.ModelGenerations
-            .AsNoTracking()
-            .ToListAsync();
-
-        return _mapper.Map<List<ModelGeneration>>(entities);
-    }
-
-    /// <summary>
-    /// Checks if an entity with the specified identifier exists
-    /// </summary>
-    /// <param name="id">The entity identifier</param>
-    /// <returns>True if entity exists, otherwise false</returns>
-    public override async Task<bool> ExistsAsync(Guid id)
-    {
-        return await _dbContext.ModelGenerations.AnyAsync(mg => mg.Id == id);
-    }
 }

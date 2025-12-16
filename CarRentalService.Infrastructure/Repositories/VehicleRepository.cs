@@ -46,41 +46,4 @@ public class VehicleRepository(
 
         return _mapper.Map<List<Vehicle>>(entities);
     }
-
-    /// <summary>
-    /// Retrieves an entity by its unique identifier
-    /// </summary>
-    /// <param name="id">The entity identifier</param>
-    /// <returns>The entity if found, otherwise null</returns>
-    public override async Task<Vehicle?> GetByIdAsync(Guid id)
-    {
-        var entity = await _dbContext.Vehicles
-            .AsNoTracking()
-            .FirstOrDefaultAsync(v => v.Id == id);
-
-        return entity == null ? null : _mapper.Map<Vehicle>(entity);
-    }
-
-    /// <summary>
-    /// Retrieves all entities
-    /// </summary>
-    /// <returns>List of all entities</returns>
-    public override async Task<List<Vehicle>> GetAllAsync()
-    {
-        var entities = await _dbContext.Vehicles
-            .AsNoTracking()
-            .ToListAsync();
-
-        return _mapper.Map<List<Vehicle>>(entities);
-    }
-
-    /// <summary>
-    /// Checks if an entity with the specified identifier exists
-    /// </summary>
-    /// <param name="id">The entity identifier</param>
-    /// <returns>True if entity exists, otherwise false</returns>
-    public override async Task<bool> ExistsAsync(Guid id)
-    {
-        return await _dbContext.Vehicles.AnyAsync(v => v.Id == id);
-    }
 }

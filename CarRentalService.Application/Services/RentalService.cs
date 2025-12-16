@@ -21,26 +21,31 @@ public class RentalService(
     /// </summary>
     public async Task<RentalResponse> CreateAsync(RentalRequest request)
     {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
 
         var renter = await renterRepository.GetByIdAsync(request.CustomerId);
-        if (renter == null)
-            throw new ArgumentException($"Renter with ID {request.CustomerId} does not exist", nameof(request.CustomerId));
+        if (renter is not null)
+        {
+            var vehicle = await vehicleRepository.GetByIdAsync(request.VehicleId);
+            if (vehicle is not null)
+            {
+                var modelGeneration = await modelGenerationRepository.GetByIdAsync(vehicle.GenerationId);
+                if (modelGeneration is not null)
+                {
+                    var rental = request.ToDomain();
+                    rental.TotalCost = modelGeneration.RentalPricePerHour * rental.DurationHours;
 
-        var vehicle = await vehicleRepository.GetByIdAsync(request.VehicleId);
-        if (vehicle == null)
-            throw new ArgumentException($"Vehicle with ID {request.VehicleId} does not exist", nameof(request.VehicleId));
+                    var createdRental = await rentalRepository.AddAsync(rental);
+                    return createdRental.ToResponse();
+                }
 
-        var modelGeneration = await modelGenerationRepository.GetByIdAsync(vehicle.GenerationId);
-        if (modelGeneration == null)
-            throw new ArgumentException($"Model generation for vehicle {request.VehicleId} does not exist", nameof(request.VehicleId));
+                throw new InvalidOperationException($"Model generation for vehicle {request.VehicleId} does not exist");
+            }
 
-        var rental = request.ToDomain();
-        rental.TotalCost = modelGeneration.RentalPricePerHour * rental.DurationHours;
+            throw new InvalidOperationException($"Vehicle with ID {request.VehicleId} does not exist");
+        }
 
-        var createdRental = await rentalRepository.AddAsync(rental);
-        return createdRental.ToResponse();
+        throw new InvalidOperationException($"Renter with ID {request.CustomerId} does not exist");
     }
 
     /// <summary>
@@ -66,33 +71,40 @@ public class RentalService(
     /// </summary>
     public async Task<RentalResponse?> UpdateAsync(Guid id, RentalRequest request)
     {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
 
         var existingRental = await rentalRepository.GetByIdAsync(id);
-        if (existingRental == null)
-            return null;
+        if (existingRental is not null)
+        {
+            var renter = await renterRepository.GetByIdAsync(request.CustomerId);
+            if (renter is not null)
+            {
+                var vehicle = await vehicleRepository.GetByIdAsync(request.VehicleId);
+                if (vehicle is not null)
+                {
+                    var modelGeneration = await modelGenerationRepository.GetByIdAsync(vehicle.GenerationId);
+                    if (modelGeneration is not null)
+                    {
+                        existingRental.RentStartTime = request.RentStartTime;
+                        existingRental.DurationHours = request.RentalDurationHours;
+                        existingRental.VehicleId = request.VehicleId;
+                        existingRental.RenterId = request.CustomerId;
+                        existingRental.TotalCost = modelGeneration.RentalPricePerHour * existingRental.DurationHours;
 
-        var renter = await renterRepository.GetByIdAsync(request.CustomerId);
-        if (renter == null)
-            throw new ArgumentException($"Renter with ID {request.CustomerId} does not exist", nameof(request.CustomerId));
+                        var updatedRental = await rentalRepository.UpdateAsync(existingRental);
+                        return updatedRental.ToResponse();
+                    }
 
-        var vehicle = await vehicleRepository.GetByIdAsync(request.VehicleId);
-        if (vehicle == null)
-            throw new ArgumentException($"Vehicle with ID {request.VehicleId} does not exist", nameof(request.VehicleId));
+                    throw new InvalidOperationException($"Model generation for vehicle {request.VehicleId} does not exist");
+                }
 
-        var modelGeneration = await modelGenerationRepository.GetByIdAsync(vehicle.GenerationId);
-        if (modelGeneration == null)
-            throw new ArgumentException($"Model generation for vehicle {request.VehicleId} does not exist", nameof(request.VehicleId));
+                throw new InvalidOperationException($"Vehicle with ID {request.VehicleId} does not exist");
+            }
 
-        existingRental.RentStartTime = request.RentStartTime;
-        existingRental.DurationHours = request.RentalDurationHours;
-        existingRental.VehicleId = request.VehicleId;
-        existingRental.RenterId = request.CustomerId;
-        existingRental.TotalCost = modelGeneration.RentalPricePerHour * existingRental.DurationHours;
+            throw new InvalidOperationException($"Renter with ID {request.CustomerId} does not exist");
+        }
 
-        var updatedRental = await rentalRepository.UpdateAsync(existingRental);
-        return updatedRental.ToResponse();
+        return null;
     }
 
     /// <summary>

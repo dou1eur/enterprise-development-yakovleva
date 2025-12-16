@@ -12,7 +12,7 @@ public class RenterEntity
     public string LicenseNumber { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
     public DateTime DateOfBirth { get; set; }
-    public ICollection<RentalEntity> Rentals { get; set; } = new List<RentalEntity>();
+    public ICollection<RentalEntity> Rentals { get; set; } = [];
 }
 
 /// <summary>

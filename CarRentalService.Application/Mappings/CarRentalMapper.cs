@@ -157,47 +157,47 @@ public static class CarRentalMapper
     /// Converts a collection of <see cref="ModelGeneration"/> entities to a list of <see cref="ModelGenerationResponse"/> DTOs
     /// </summary>
     public static List<ModelGenerationResponse> ToResponseList(this IEnumerable<ModelGeneration> domains) =>
-        domains.Select(ToResponse).ToList();
+        [.. domains.Select(ToResponse)];
 
     /// <summary>
     /// Converts a collection of <see cref="Rental"/> entities to a list of <see cref="RentalResponse"/> DTOs
     /// </summary>
     public static List<RentalResponse> ToResponseList(this IEnumerable<Rental> domains) =>
-        domains.Select(ToResponse).ToList();
+        [.. domains.Select(ToResponse)];
 
     /// <summary>
     /// Converts a collection of <see cref="Renter"/> entities to a list of <see cref="RenterResponse"/> DTOs
     /// </summary>
     public static List<RenterResponse> ToResponseList(this IEnumerable<Renter> domains) =>
-        domains.Select(ToResponse).ToList();
+        [.. domains.Select(ToResponse)];
 
     /// <summary>
     /// Converts a collection of <see cref="Vehicle"/> entities to a list of <see cref="VehicleResponse"/> DTOs
     /// </summary>
     public static List<VehicleResponse> ToResponseList(this IEnumerable<Vehicle> domains) =>
-        domains.Select(ToResponse).ToList();
+        [.. domains.Select(ToResponse)];
 
     /// <summary>
     /// Converts a collection of <see cref="VehicleModel"/> entities to a list of <see cref="VehicleModelResponse"/> DTOs
     /// </summary>
     public static List<VehicleModelResponse> ToResponseList(this IEnumerable<VehicleModel> domains) =>
-        domains.Select(ToResponse).ToList();
+        [.. domains.Select(ToResponse)];
 
     /// <summary>
     /// Converts a collection of vehicle rental count tuples to a list of <see cref="VehicleRentalCountResponse"/> DTOs
     /// </summary>
     public static List<VehicleRentalCountResponse> ToResponseList(this IEnumerable<(Vehicle Vehicle, int RentalCount)> tuples) =>
-        tuples.Select(ToResponse).ToList();
+        [.. tuples.Select(ToResponse)];
 
     /// <summary>
     /// Converts a collection of renter total spent tuples to a list of <see cref="RenterTotalSpentResponse"/> DTOs
     /// </summary>
     public static List<RenterTotalSpentResponse> ToResponseList(this IEnumerable<(Renter Renter, decimal TotalSpent)> tuples) =>
-        tuples.Select(ToResponse).ToList();
+        [.. tuples.Select(ToResponse)];
 
     /// <summary>
     /// Creates a <see cref="CollectionResponse{T}"/> from a collection of items
     /// </summary>
     public static CollectionResponse<T> ToCollectionResponse<T>(this IEnumerable<T> items) =>
-        new(items.ToList());
+        new([.. items]);
 }

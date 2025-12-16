@@ -23,17 +23,17 @@ public class ModelGenerationService(
     /// <exception cref="ArgumentNullException">Thrown when the request is null</exception>
     public async Task<ModelGenerationResponse> CreateAsync(ModelGenerationRequest request)
     {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
 
         var vehicleModel = await vehicleModelRepository.GetByIdAsync(request.VehicleModelId);
-        if (vehicleModel == null)
-            throw new ArgumentException($"Vehicle model with ID {request.VehicleModelId} does not exist.", nameof(request.VehicleModelId));
+        if (vehicleModel is not null)
+        {
+            var modelGeneration = request.ToDomain();
+            var createdModelGeneration = await modelGenerationRepository.AddAsync(modelGeneration);
+            return createdModelGeneration.ToResponse();
+        }
 
-        var modelGeneration = request.ToDomain();
-        var createdModelGeneration = await modelGenerationRepository.AddAsync(modelGeneration);
-
-        return createdModelGeneration.ToResponse();
+        throw new InvalidOperationException($"Vehicle model with ID {request.VehicleModelId} does not exist.");
     }
 
     /// <summary>
@@ -67,25 +67,28 @@ public class ModelGenerationService(
     /// <exception cref="ArgumentNullException">Thrown when the request is null</exception>
     public async Task<ModelGenerationResponse?> UpdateAsync(Guid id, ModelGenerationRequest request)
     {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
 
         var existingModelGeneration = await modelGenerationRepository.GetByIdAsync(id);
-        if (existingModelGeneration == null)
-            return null;
+        if (existingModelGeneration is not null)
+        {
+            var vehicleModel = await vehicleModelRepository.GetByIdAsync(request.VehicleModelId);
+            if (vehicleModel is not null)
+            {
+                existingModelGeneration.Year = request.Year;
+                existingModelGeneration.EngineVolume = request.EngineVolume;
+                existingModelGeneration.Transmission = request.Transmission;
+                existingModelGeneration.RentalPricePerHour = request.RentalPricePerHour;
+                existingModelGeneration.VehicleModelId = request.VehicleModelId;
 
-        var vehicleModel = await vehicleModelRepository.GetByIdAsync(request.VehicleModelId);
-        if (vehicleModel == null)
-            throw new ArgumentException($"Vehicle model with ID {request.VehicleModelId} does not exist.", nameof(request.VehicleModelId));
+                var updatedModelGeneration = await modelGenerationRepository.UpdateAsync(existingModelGeneration);
+                return updatedModelGeneration.ToResponse();
+            }
 
-        existingModelGeneration.Year = request.Year;
-        existingModelGeneration.EngineVolume = request.EngineVolume;
-        existingModelGeneration.Transmission = request.Transmission;
-        existingModelGeneration.RentalPricePerHour = request.RentalPricePerHour;
-        existingModelGeneration.VehicleModelId = request.VehicleModelId;
+            throw new InvalidOperationException($"Vehicle model with ID {request.VehicleModelId} does not exist.");
+        }
 
-        var updatedModelGeneration = await modelGenerationRepository.UpdateAsync(existingModelGeneration);
-        return updatedModelGeneration.ToResponse();
+        return null;
     }
 
     /// <summary>
