@@ -34,5 +34,7 @@ public class Rental
     /// Total cost of the rental
     /// </summary>
     public decimal TotalCost { get; set; }
+    public Vehicle? Vehicle { get; set; }
+    public Renter? Renter { get; set; }
 
 }

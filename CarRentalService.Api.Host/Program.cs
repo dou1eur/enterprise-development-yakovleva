@@ -3,6 +3,7 @@ using CarRentalService.Infrastructure;
 using CarRentalService.Infrastructure.Data;
 
 using CarRentalService.ServiceDefaults;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,7 +37,7 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<CarRentalDbContext>();
 
     await Task.Delay(5000);
-    await context.Database.EnsureCreatedAsync();
+    await context.Database.MigrateAsync();
 
     if (!context.VehicleModels.Any())
         await DataSeeder.SeedAsync(context);

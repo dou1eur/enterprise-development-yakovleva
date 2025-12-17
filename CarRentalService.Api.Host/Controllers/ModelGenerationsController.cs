@@ -13,7 +13,7 @@ namespace CarRentalService.Api.Host.Controllers;
 public class ModelGenerationsController(
     ILogger<ModelGenerationsController> logger,
     IModelGenerationService modelGenerationService)
-    : CrudControllerBase<ModelGenerationResponse, ModelGenerationRequest, ModelGenerationRequest, Guid>(logger)
+    : CrudControllerBase<ModelGenerationResponse, ModelGenerationRequest, Guid>(logger)
 {
     /// <summary>
     /// Extracts the identifier from a ModelGenerationResponse DTO

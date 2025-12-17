@@ -1,7 +1,9 @@
-﻿using CarRentalService.Application.Contracts.ModelGeneration;
+﻿using AutoMapper;
+using CarRentalService.Application.Contracts.ModelGeneration;
 using CarRentalService.Application.Interfaces;
+using CarRentalService.Domain;
 using CarRentalService.Interfaces.Repositories;
-using CarRentalService.Application.Mappings;
+using Microsoft.Extensions.Logging;
 
 namespace CarRentalService.Application.Services;
 
@@ -9,10 +11,15 @@ namespace CarRentalService.Application.Services;
 /// Service for managing model generations in the car rental system
 /// Handles model generation operations with validation of related vehicle models
 /// </summary>
+/// <param name="modelGenerationRepository">Repository for model generations</param>
+/// <param name="vehicleModelRepository">Repository for vehicle models</param>
+/// <param name="mapper">AutoMapper instance</param>
+/// <param name="logger">Logger instance</param>
 public class ModelGenerationService(
     IModelGenerationRepository modelGenerationRepository,
-    IVehicleModelRepository vehicleModelRepository)
-    : IModelGenerationService
+    IVehicleModelRepository vehicleModelRepository,
+    IMapper mapper,
+    ILogger<ModelGenerationService> logger) : IModelGenerationService
 {
     /// <summary>
     /// Creates a new model generation record in the system
@@ -25,15 +32,24 @@ public class ModelGenerationService(
     {
         ArgumentNullException.ThrowIfNull(request);
 
+        logger.LogInformation("Creating new model generation for vehicle model {VehicleModelId}",
+            request.VehicleModelId);
+
         var vehicleModel = await vehicleModelRepository.GetByIdAsync(request.VehicleModelId);
-        if (vehicleModel is not null)
+        if (vehicleModel is null)
         {
-            var modelGeneration = request.ToDomain();
-            var createdModelGeneration = await modelGenerationRepository.AddAsync(modelGeneration);
-            return createdModelGeneration.ToResponse();
+            logger.LogWarning("Vehicle model with ID {VehicleModelId} not found", request.VehicleModelId);
+            throw new ArgumentException($"Vehicle model with ID {request.VehicleModelId} does not exist.");
         }
 
-        throw new InvalidOperationException($"Vehicle model with ID {request.VehicleModelId} does not exist.");
+        var modelGeneration = mapper.Map<ModelGeneration>(request);
+        modelGeneration.Id = Guid.NewGuid();
+
+        var createdModelGeneration = await modelGenerationRepository.AddAsync(modelGeneration);
+
+        logger.LogInformation("Model generation created with ID {ModelGenerationId}", createdModelGeneration.Id);
+
+        return mapper.Map<ModelGenerationResponse>(createdModelGeneration);
     }
 
     /// <summary>
@@ -43,8 +59,17 @@ public class ModelGenerationService(
     /// <returns>The model generation response if found; otherwise, <c>null</c></returns>
     public async Task<ModelGenerationResponse?> GetAsync(Guid id)
     {
+        logger.LogInformation("Retrieving model generation with ID {ModelGenerationId}", id);
+
         var modelGeneration = await modelGenerationRepository.GetByIdAsync(id);
-        return modelGeneration?.ToResponse();
+
+        if (modelGeneration is null)
+        {
+            logger.LogWarning("Model generation with ID {ModelGenerationId} not found", id);
+            return null;
+        }
+
+        return mapper.Map<ModelGenerationResponse>(modelGeneration);
     }
 
     /// <summary>
@@ -53,8 +78,13 @@ public class ModelGenerationService(
     /// <returns>A list of all model generation responses</returns>
     public async Task<List<ModelGenerationResponse>> GetAllAsync()
     {
+        logger.LogInformation("Retrieving all model generations");
+
         var modelGenerations = await modelGenerationRepository.GetAllAsync();
-        return modelGenerations.ToResponseList();
+
+        logger.LogDebug("Found {Count} model generations", modelGenerations.Count);
+
+        return mapper.Map<List<ModelGenerationResponse>>(modelGenerations);
     }
 
     /// <summary>
@@ -69,26 +99,28 @@ public class ModelGenerationService(
     {
         ArgumentNullException.ThrowIfNull(request);
 
+        logger.LogInformation("Updating model generation with ID {ModelGenerationId}", id);
+
         var existingModelGeneration = await modelGenerationRepository.GetByIdAsync(id);
-        if (existingModelGeneration is not null)
+        if (existingModelGeneration is null)
         {
-            var vehicleModel = await vehicleModelRepository.GetByIdAsync(request.VehicleModelId);
-            if (vehicleModel is not null)
-            {
-                existingModelGeneration.Year = request.Year;
-                existingModelGeneration.EngineVolume = request.EngineVolume;
-                existingModelGeneration.Transmission = request.Transmission;
-                existingModelGeneration.RentalPricePerHour = request.RentalPricePerHour;
-                existingModelGeneration.VehicleModelId = request.VehicleModelId;
-
-                var updatedModelGeneration = await modelGenerationRepository.UpdateAsync(existingModelGeneration);
-                return updatedModelGeneration.ToResponse();
-            }
-
-            throw new InvalidOperationException($"Vehicle model with ID {request.VehicleModelId} does not exist.");
+            logger.LogWarning("Model generation with ID {ModelGenerationId} not found for update", id);
+            return null;
         }
 
-        return null;
+        var vehicleModel = await vehicleModelRepository.GetByIdAsync(request.VehicleModelId);
+        if (vehicleModel is null)
+        {
+            logger.LogWarning("Vehicle model with ID {VehicleModelId} not found for update", request.VehicleModelId);
+            throw new ArgumentException($"Vehicle model with ID {request.VehicleModelId} does not exist.");
+        }
+
+        mapper.Map(request, existingModelGeneration);
+        var updatedModelGeneration = await modelGenerationRepository.UpdateAsync(existingModelGeneration);
+
+        logger.LogInformation("Model generation with ID {ModelGenerationId} updated successfully", id);
+
+        return mapper.Map<ModelGenerationResponse>(updatedModelGeneration);
     }
 
     /// <summary>
@@ -98,6 +130,19 @@ public class ModelGenerationService(
     /// <returns><c>true</c> if deletion was successful; otherwise, <c>false</c></returns>
     public async Task<bool> DeleteAsync(Guid id)
     {
-        return await modelGenerationRepository.DeleteAsync(id);
+        logger.LogInformation("Deleting model generation with ID {ModelGenerationId}", id);
+
+        var result = await modelGenerationRepository.DeleteAsync(id);
+
+        if (result)
+        {
+            logger.LogInformation("Model generation with ID {ModelGenerationId} deleted successfully", id);
+        }
+        else
+        {
+            logger.LogWarning("Model generation with ID {ModelGenerationId} not found for deletion", id);
+        }
+
+        return result;
     }
 }

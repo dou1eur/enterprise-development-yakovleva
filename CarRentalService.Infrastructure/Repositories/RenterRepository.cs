@@ -1,33 +1,25 @@
-﻿using AutoMapper;
-using CarRentalService.Interfaces.Repositories;
+﻿using CarRentalService.Interfaces.Repositories;
 using CarRentalService.Domain;
 using CarRentalService.Infrastructure.Data;
-using CarRentalService.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarRentalService.Infrastructure.Repositories;
 
 /// <summary>
 /// PostgreSQL repository implementation for renter entities
-/// Handles data access for renters with mapping between domain and entity models
+/// Handles data access for renters
 /// </summary>
-public class RenterRepository(
-    CarRentalDbContext dbContext,
-    IMapper mapper)
-    : CarRentalServiceBaseRepository<RenterEntity, Renter, Guid>(dbContext, mapper),
-      IRenterRepository
+/// <param name="dbContext">The database context</param>
+public class RenterRepository(CarRentalDbContext dbContext)
+    : BaseRepository<Renter, Guid>(dbContext), IRenterRepository
 {
     /// <summary>
     /// Retrieves a renter by their driver's license number
     /// </summary>
     /// <param name="licenseNumber">The driver's license number</param>
     /// <returns>The renter if found, otherwise null</returns>
-    public async Task<Renter?> GetByLicenseNumberAsync(string licenseNumber)
-    {
-        var entity = await _dbContext.Renters
+    public async Task<Renter?> GetByLicenseNumberAsync(string licenseNumber) =>
+        await DbSet
             .AsNoTracking()
             .FirstOrDefaultAsync(r => r.LicenseNumber == licenseNumber);
-
-        return entity == null ? null : _mapper.Map<Renter>(entity);
-    }
 }

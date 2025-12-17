@@ -40,11 +40,4 @@ public interface IRepository<TEntity, TId>
     /// <param name="id">The entity identifier</param>
     /// <returns>True if deletion was successful, otherwise false</returns>
     public Task<bool> DeleteAsync(TId id);
-
-    /// <summary>
-    /// Checks if an entity with the specified identifier exists
-    /// </summary>
-    /// <param name="id">The entity identifier</param>
-    /// <returns>True if entity exists, otherwise false</returns>
-    public Task<bool> ExistsAsync(TId id);
 }

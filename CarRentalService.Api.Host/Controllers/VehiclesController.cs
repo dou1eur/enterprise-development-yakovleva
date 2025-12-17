@@ -13,7 +13,7 @@ namespace CarRentalService.Api.Host.Controllers;
 public class VehiclesController(
     ILogger<VehiclesController> logger,
     IVehicleService vehicleService)
-    : CrudControllerBase<VehicleResponse, VehicleRequest, VehicleRequest, Guid>(logger)
+    : CrudControllerBase<VehicleResponse, VehicleRequest, Guid>(logger)
 {
     /// <summary>
     /// Extracts the identifier from a VehicleResponse DTO

@@ -17,6 +17,8 @@ public static class ServiceExtensions
     /// <returns>The service collection with registered application services</returns>
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
+        services.AddAutoMapper(typeof(ServiceExtensions).Assembly);
+
         services.AddScoped<IAnalyticsService, AnalyticsService>();
         services.AddScoped<IModelGenerationService, ModelGenerationService>();
         services.AddScoped<IRentalService, RentalService>();
@@ -27,4 +29,3 @@ public static class ServiceExtensions
         return services;
     }
 }
-

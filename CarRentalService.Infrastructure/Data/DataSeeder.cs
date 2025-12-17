@@ -1,9 +1,11 @@
 ﻿using CarRentalService.Domain;
-using CarRentalService.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarRentalService.Infrastructure.Data;
 
+/// <summary>
+/// Provides seed data for the CarRentalService database
+/// </summary>
 public static class DataSeeder
 {
     private static readonly Guid _chevroletCobaltModelId = Guid.Parse("11111111-1111-1111-1111-111111111111");
@@ -20,15 +22,18 @@ public static class DataSeeder
     private static readonly Guid _rental3Id = Guid.Parse("CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC");
     private static readonly Guid _rental4Id = Guid.Parse("DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDDD");
 
+    /// <summary>
+    /// Seeds the database with initial test data
+    /// </summary>
+    /// <param name="context">The database context</param>
     public static async Task SeedAsync(CarRentalDbContext context)
     {
         try
         {
-
             if (await context.VehicleModels.AnyAsync())
                 return;
 
-            var chevroletCobaltModel = new VehicleModelEntity
+            var chevroletCobaltModel = new VehicleModel
             {
                 Id = _chevroletCobaltModelId,
                 Name = "Chevrolet Cobalt",
@@ -38,7 +43,7 @@ public static class DataSeeder
                 VehicleClass = VehicleClass.Compact
             };
 
-            var toyotaCamryModel = new VehicleModelEntity
+            var toyotaCamryModel = new VehicleModel
             {
                 Id = _toyotaCamryModelId,
                 Name = "Toyota Camry",
@@ -50,7 +55,7 @@ public static class DataSeeder
 
             await context.VehicleModels.AddRangeAsync(chevroletCobaltModel, toyotaCamryModel);
 
-            var cobaltGeneration = new ModelGenerationEntity
+            var cobaltGeneration = new ModelGeneration
             {
                 Id = _cobaltGenerationId,
                 Year = 2016,
@@ -60,7 +65,7 @@ public static class DataSeeder
                 VehicleModelId = chevroletCobaltModel.Id
             };
 
-            var camryGeneration = new ModelGenerationEntity
+            var camryGeneration = new ModelGeneration
             {
                 Id = _camryGenerationId,
                 Year = 2023,
@@ -72,94 +77,94 @@ public static class DataSeeder
 
             await context.ModelGenerations.AddRangeAsync(cobaltGeneration, camryGeneration);
 
-            var cobaltVehicle1 = new VehicleEntity
+            var cobaltVehicle1 = new Vehicle
             {
                 Id = _cobaltVehicle1Id,
-                LicensePlate = "Н099ОР",
+                LicensePlate = "H0990P",
                 Color = "Black",
-                ModelGenerationId = cobaltGeneration.Id
+                GenerationId = cobaltGeneration.Id
             };
 
-            var cobaltVehicle2 = new VehicleEntity
+            var cobaltVehicle2 = new Vehicle
             {
                 Id = _cobaltVehicle2Id,
-                LicensePlate = "А071ВР",
+                LicensePlate = "A071BP",
                 Color = "White",
-                ModelGenerationId = cobaltGeneration.Id
+                GenerationId = cobaltGeneration.Id
             };
 
-            var camryVehicle = new VehicleEntity
+            var camryVehicle = new Vehicle
             {
                 Id = _camryVehicleId,
-                LicensePlate = "Т801УХ",
+                LicensePlate = "T8019X",
                 Color = "Silver",
-                ModelGenerationId = camryGeneration.Id
+                GenerationId = camryGeneration.Id
             };
 
             await context.Vehicles.AddRangeAsync(cobaltVehicle1, cobaltVehicle2, camryVehicle);
 
-            var renter1 = new RenterEntity
+            var renter1 = new Renter
             {
                 Id = _renter1Id,
                 LicenseNumber = "1234123412",
-                FullName = "Андрей Петров",
-                DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Local)
+                FullName = "Алексей Петров",
+                DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             };
 
-            var renter2 = new RenterEntity
+            var renter2 = new Renter
             {
                 Id = _renter2Id,
                 LicenseNumber = "3456345634",
                 FullName = "Екатерина Новикова",
-                DateOfBirth = new DateTime(1985, 1, 1, 0, 0, 0, DateTimeKind.Local)
+                DateOfBirth = new DateTime(1985, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             };
 
             await context.Renters.AddRangeAsync(renter1, renter2);
 
-            var rental1 = new RentalEntity
+            var rental1 = new Rental
             {
                 Id = _rental1Id,
-                RentStartTime = new DateTime(2024, 1, 1, 10, 0, 0, DateTimeKind.Local),
+                RentStartTime = new DateTime(2024, 1, 1, 10, 0, 0, DateTimeKind.Utc),
                 DurationHours = 5,
                 TotalCost = 1200.00m * 5,
                 VehicleId = cobaltVehicle1.Id,
                 RenterId = renter1.Id
             };
 
-            var rental2 = new RentalEntity
+            var rental2 = new Rental
             {
                 Id = _rental2Id,
-                RentStartTime = new DateTime(2024, 1, 2, 14, 0, 0, DateTimeKind.Local),
+                RentStartTime = new DateTime(2024, 1, 2, 14, 0, 0, DateTimeKind.Utc),
                 DurationHours = 3,
                 TotalCost = 1200.00m * 3,
                 VehicleId = cobaltVehicle1.Id,
                 RenterId = renter2.Id
             };
 
-            var rental3 = new RentalEntity
+            var rental3 = new Rental
             {
                 Id = _rental3Id,
-                RentStartTime = new DateTime(2024, 1, 3, 9, 0, 0, DateTimeKind.Local),
+                RentStartTime = new DateTime(2024, 1, 3, 9, 0, 0, DateTimeKind.Utc),
                 DurationHours = 8,
                 TotalCost = 1200.00m * 8,
                 VehicleId = cobaltVehicle2.Id,
                 RenterId = renter1.Id
             };
 
-            var rental4 = new RentalEntity
+            var rental4 = new Rental
             {
                 Id = _rental4Id,
-                RentStartTime = new DateTime(2024, 1, 4, 11, 0, 0, DateTimeKind.Local),
+                RentStartTime = new DateTime(2024, 1, 4, 11, 0, 0, DateTimeKind.Utc),
                 DurationHours = 6,
                 TotalCost = 1500.00m * 6,
                 VehicleId = camryVehicle.Id,
                 RenterId = renter2.Id
             };
 
-            var currentRental = new RentalEntity
+            var currentRental = new Rental
             {
                 Id = Guid.NewGuid(),
-                RentStartTime = DateTime.Now.AddHours(-2),
+                RentStartTime = DateTime.UtcNow.AddHours(-2),
                 DurationHours = 5,
                 TotalCost = 1200.00m * 5,
                 VehicleId = cobaltVehicle1.Id,
@@ -176,8 +181,28 @@ public static class DataSeeder
             throw;
         }
     }
+
+    /// <summary>
+    /// Gets the Chevrolet Cobalt model identifier for testing purposes
+    /// </summary>
+    /// <returns>The Chevrolet Cobalt model identifier</returns>
     public static Guid GetChevroletCobaltModelId() => _chevroletCobaltModelId;
+
+    /// <summary>
+    /// Gets the Toyota Camry model identifier for testing purposes
+    /// </summary>
+    /// <returns>The Toyota Camry model identifier</returns>
     public static Guid GetToyotaCamryModelId() => _toyotaCamryModelId;
+
+    /// <summary>
+    /// Gets the first Cobalt vehicle identifier for testing purposes
+    /// </summary>
+    /// <returns>The Cobalt vehicle identifier</returns>
     public static Guid GetCobaltVehicle1Id() => _cobaltVehicle1Id;
+
+    /// <summary>
+    /// Gets the first renter identifier for testing purposes
+    /// </summary>
+    /// <returns>The renter identifier</returns>
     public static Guid GetRenter1Id() => _renter1Id;
 }

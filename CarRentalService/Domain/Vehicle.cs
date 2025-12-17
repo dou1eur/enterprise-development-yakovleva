@@ -24,4 +24,5 @@ public class Vehicle
     /// Identifier of the vehicle generation
     /// </summary>
     public Guid GenerationId { get; set; }
+    public ModelGeneration? ModelGeneration { get; set; }
 }

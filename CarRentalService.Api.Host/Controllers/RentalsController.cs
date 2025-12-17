@@ -13,7 +13,7 @@ namespace CarRentalService.Api.Host.Controllers;
 public class RentalsController(
     ILogger<RentalsController> logger,
     IRentalService rentalService)
-    : CrudControllerBase<RentalResponse, RentalRequest, RentalRequest, Guid>(logger)
+    : CrudControllerBase<RentalResponse, RentalRequest, Guid>(logger)
 {
     /// <summary>
     /// Extracts the identifier from a RentalResponse DTO
