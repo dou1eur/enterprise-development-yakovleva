@@ -12,12 +12,13 @@
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" Version="13.1.0" />
     <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.1.0" />
-	  <PackageReference Include="Aspire.Hosting.Kafka" Version="13.1.0" />
+	<PackageReference Include="Aspire.Hosting.Kafka" Version="13.1.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CarRentalService.Api.Host\CarRentalService.Api.Host.csproj" />
+	  <ProjectReference Include="..\CarRentalService.Api.Host\CarRentalService.Api.Host.csproj" />
 	  <ProjectReference Include="..\CarRentalService.Generator.Kafka\CarRentalService.Generator.Kafka.csproj" />
+	  <ProjectReference Include="..\CarRentalService.Infrastructure.Kafka\CarRentalService.Infrastructure.Kafka.csproj" />
   </ItemGroup>
 
 </Project>
