@@ -196,13 +196,13 @@ namespace CarRentalService.Infrastructure.Data.Migrations
                     b.HasOne("CarRentalService.Domain.Renter", "Renter")
                         .WithMany()
                         .HasForeignKey("RenterId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CarRentalService.Domain.Vehicle", "Vehicle")
                         .WithMany()
                         .HasForeignKey("VehicleId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Renter");

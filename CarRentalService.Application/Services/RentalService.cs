@@ -38,10 +38,10 @@ public class RentalService(
 
         logger.LogInformation(
             "Creating new rental for vehicle {VehicleId} by renter {RenterId}",
-            request.VehicleId, request.CustomerId);
+            request.VehicleId, request.RenterId);
 
-        var _ = await renterRepository.GetByIdAsync(request.CustomerId)
-            ?? throw new ArgumentException($"Renter with ID {request.CustomerId} does not exist.");
+        var _ = await renterRepository.GetByIdAsync(request.RenterId)
+            ?? throw new ArgumentException($"Renter with ID {request.RenterId} does not exist.");
 
         var vehicle = await vehicleRepository.GetByIdAsync(request.VehicleId)
             ?? throw new ArgumentException($"Vehicle with ID {request.VehicleId} does not exist.");
@@ -116,8 +116,8 @@ public class RentalService(
             return null;
         }
 
-        var _ = await renterRepository.GetByIdAsync(request.CustomerId)
-            ?? throw new ArgumentException($"Renter with ID {request.CustomerId} does not exist.");
+        var _ = await renterRepository.GetByIdAsync(request.RenterId)
+            ?? throw new ArgumentException($"Renter with ID {request.RenterId} does not exist.");
 
         var vehicle = await vehicleRepository.GetByIdAsync(request.VehicleId)
             ?? throw new ArgumentException($"Vehicle with ID {request.VehicleId} does not exist.");

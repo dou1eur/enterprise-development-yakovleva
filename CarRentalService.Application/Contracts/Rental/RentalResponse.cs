@@ -32,5 +32,5 @@ public sealed record RentalResponse(
     /// <summary>
     /// Identifier of the customer
     /// </summary>
-    Guid CustomerId
+    Guid RenterId
 );

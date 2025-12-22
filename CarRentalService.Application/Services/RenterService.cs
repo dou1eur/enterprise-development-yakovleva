@@ -142,7 +142,7 @@ public class RenterService(
     {
         if (dateOfBirth.AddYears(18) > DateTime.UtcNow)
         {
-            throw new ArgumentException("Renter must be at least 18.");
+            throw new ArgumentException($"Renter must be at least 18.");
         }
     }
 }

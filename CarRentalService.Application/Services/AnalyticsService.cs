@@ -74,7 +74,7 @@ public class AnalyticsService(
         var rentals = await rentalRepository.GetAllAsync();
         var vehicles = await vehicleRepository.GetAllAsync();
 
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         var rentedVehicleIds = rentals
             .Where(rental => rental.RentStartTime <= now && rental.RentStartTime.AddHours(rental.DurationHours) >= now)
             .Select(rental => rental.VehicleId)

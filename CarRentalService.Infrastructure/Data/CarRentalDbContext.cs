@@ -82,7 +82,8 @@ public class CarRentalDbContext(DbContextOptions<CarRentalDbContext> options) : 
 
             builder.HasOne(mg => mg.VehicleModel)
                 .WithMany()
-                .HasForeignKey(mg => mg.VehicleModelId);
+                .HasForeignKey(mg => mg.VehicleModelId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Vehicle>(builder =>
@@ -96,9 +97,11 @@ public class CarRentalDbContext(DbContextOptions<CarRentalDbContext> options) : 
             builder.Property(v => v.Color)
                 .IsRequired()
                 .HasMaxLength(50);
+
             builder.HasOne(v => v.ModelGeneration)
                 .WithMany()
-                .HasForeignKey(v => v.GenerationId);
+                .HasForeignKey(v => v.GenerationId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasIndex(v => v.LicensePlate)
                 .IsUnique();
@@ -120,11 +123,12 @@ public class CarRentalDbContext(DbContextOptions<CarRentalDbContext> options) : 
             builder.HasOne(r => r.Vehicle)
                 .WithMany()
                 .HasForeignKey(r => r.VehicleId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.HasOne(r => r.Renter)
                 .WithMany()
                 .HasForeignKey(r => r.RenterId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

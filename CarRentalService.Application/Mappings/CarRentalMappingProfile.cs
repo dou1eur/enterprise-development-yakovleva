@@ -17,11 +17,51 @@ public class CarRentalMappingProfile : Profile
 {
     public CarRentalMappingProfile()
     {
-        CreateMap<ModelGeneration, ModelGenerationResponse>();
-        CreateMap<Rental, RentalResponse>();
-        CreateMap<Renter, RenterResponse>();
-        CreateMap<Vehicle, VehicleResponse>();
-        CreateMap<VehicleModel, VehicleModelResponse>();
+        CreateMap<ModelGeneration, ModelGenerationResponse>()
+            .ConstructUsing(src => new ModelGenerationResponse(
+                src.Id,
+                src.Year,
+                src.EngineVolume,
+                src.Transmission,
+                src.RentalPricePerHour,
+                src.VehicleModelId
+            ));
+
+        CreateMap<Rental, RentalResponse>()
+            .ConstructUsing(src => new RentalResponse(
+                src.Id,
+                src.RentStartTime,
+                src.DurationHours,
+                src.TotalCost,
+                src.VehicleId,
+                src.RenterId
+            ));
+
+        CreateMap<Renter, RenterResponse>()
+            .ConstructUsing(src => new RenterResponse(
+                src.Id,
+                src.LicenseNumber,
+                src.FullName,
+                src.DateOfBirth
+            ));
+
+        CreateMap<Vehicle, VehicleResponse>()
+            .ConstructUsing(src => new VehicleResponse(
+                src.Id,
+                src.LicensePlate,
+                src.Color,
+                src.GenerationId
+            ));
+
+        CreateMap<VehicleModel, VehicleModelResponse>()
+            .ConstructUsing(src => new VehicleModelResponse(
+                src.Id,
+                src.Name,
+                src.DriveType,
+                src.SeatCount,
+                src.BodyType,
+                src.VehicleClass
+            ));
 
         CreateMap<ModelGenerationRequest, ModelGeneration>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())

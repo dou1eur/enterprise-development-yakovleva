@@ -1,6 +1,6 @@
-﻿using CarRentalService.Interfaces.Repositories;
-using CarRentalService.Domain;
+﻿using CarRentalService.Domain;
 using CarRentalService.Infrastructure.Data;
+using CarRentalService.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarRentalService.Infrastructure.Repositories;

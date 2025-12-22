@@ -1,10 +1,8 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace CarRentalService.Infrastructure.Data.Migrations;
-
 /// <inheritdoc />
 public partial class InitialCreate : Migration
 {
@@ -102,13 +100,13 @@ public partial class InitialCreate : Migration
                     column: x => x.RenterId,
                     principalTable: "Renters",
                     principalColumn: "Id",
-                    onDelete: ReferentialAction.Restrict);
+                    onDelete: ReferentialAction.Cascade);
                 table.ForeignKey(
                     name: "FK_Rentals_Vehicles_VehicleId",
                     column: x => x.VehicleId,
                     principalTable: "Vehicles",
                     principalColumn: "Id",
-                    onDelete: ReferentialAction.Restrict);
+                    onDelete: ReferentialAction.Cascade);
             });
 
         migrationBuilder.CreateIndex(

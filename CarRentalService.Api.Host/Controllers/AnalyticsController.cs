@@ -33,7 +33,7 @@ public class AnalyticsController(IAnalyticsService analyticsService, ILogger<Ana
         catch (ArgumentException ex)
         {
             logger.LogWarning(ex, "Invalid request for vehicle model {VehicleModelId}", vehicleModelId);
-            return BadRequest("Invalid request data");
+            return BadRequest($"Invalid request data: {ex.Message}");
         }
         catch (Exception ex)
         {
@@ -75,14 +75,13 @@ public class AnalyticsController(IAnalyticsService analyticsService, ILogger<Ana
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<List<VehicleRentalCountResponse>>> GetTopRentedVehicles([FromQuery, Range(1, 100)] int top = 5)
     {
-        if (!ModelState.IsValid)
-        {
-            logger.LogWarning("Invalid top parameter: {Top}", top);
-            return BadRequest("Invalid parameter value");
-        }
-
         try
         {
+            if (!ModelState.IsValid)
+            {
+                logger.LogWarning("Invalid top parameter: {Top}", top);
+                return BadRequest("Invalid parameter value");
+            }
             logger.LogInformation("Getting top {Top} rented vehicles", top);
             var result = await analyticsService.GetTopRentedVehiclesAsync(top);
             return Ok(result);
@@ -90,7 +89,7 @@ public class AnalyticsController(IAnalyticsService analyticsService, ILogger<Ana
         catch (ArgumentException ex)
         {
             logger.LogWarning(ex, "Invalid top parameter: {Top}", top);
-            return BadRequest("Invalid parameter value");
+            return BadRequest($"Invalid parameter value: {ex.Message}");
         }
         catch (Exception ex)
         {
@@ -132,14 +131,13 @@ public class AnalyticsController(IAnalyticsService analyticsService, ILogger<Ana
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<List<RenterTotalSpentResponse>>> GetTopRentersByRentalSum([FromQuery, Range(1, 100)] int top = 5)
     {
-        if (!ModelState.IsValid)
-        {
-            logger.LogWarning("Invalid top parameter: {Top}", top);
-            return BadRequest("Invalid parameter value");
-        }
-
         try
         {
+            if (!ModelState.IsValid)
+            {
+                logger.LogWarning("Invalid top parameter: {Top}", top);
+                return BadRequest("Invalid parameter value");
+            }
             logger.LogInformation("Getting top {Top} renters by rental sum", top);
             var result = await analyticsService.GetTopRentersByRentalSumAsync(top);
             return Ok(result);
@@ -147,7 +145,7 @@ public class AnalyticsController(IAnalyticsService analyticsService, ILogger<Ana
         catch (ArgumentException ex)
         {
             logger.LogWarning(ex, "Invalid top parameter: {Top}", top);
-            return BadRequest("Invalid parameter value");
+            return BadRequest($"Invalid parameter value: {ex.Message}");
         }
         catch (Exception ex)
         {

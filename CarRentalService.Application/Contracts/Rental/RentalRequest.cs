@@ -22,5 +22,5 @@ public sealed record RentalRequest(
     /// <summary>
     /// Identifier of the renter
     /// </summary>
-    Guid CustomerId
+    Guid RenterId
 );

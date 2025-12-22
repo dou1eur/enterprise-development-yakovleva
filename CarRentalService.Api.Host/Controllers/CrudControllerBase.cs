@@ -69,7 +69,12 @@ public abstract class CrudControllerBase<TDto, TRequestDto, TId>(
             catch (ArgumentException ex)
             {
                 logger.LogWarning(ex, "Business validation failed for {Operation}", nameof(Create));
-                return BadRequest("Invalid request data");
+                return BadRequest($"Invalid request data: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Unexpected error in {Operation}", nameof(Create));
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }
         });
 
@@ -97,7 +102,12 @@ public abstract class CrudControllerBase<TDto, TRequestDto, TId>(
             catch (ArgumentException ex)
             {
                 logger.LogWarning(ex, "Business validation failed for {Operation}", nameof(Update));
-                return BadRequest("Invalid request data");
+                return BadRequest($"Invalid request data: : {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Unexpected error in {Operation}", nameof(Update));
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }
         });
 

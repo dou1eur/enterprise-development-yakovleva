@@ -19,7 +19,7 @@ public enum DriveType
     /// Four-Wheel Drive
     /// </summary>
     FourWd,
-   
+
     /// <summary>
     /// All-Wheel Drive
     /// </summary>

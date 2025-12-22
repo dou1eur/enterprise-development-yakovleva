@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CarRentalService.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(CarRentalDbContext))]
-    [Migration("20251217104602_InitialCreate")]
+    [Migration("20251222062646_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -199,13 +199,13 @@ namespace CarRentalService.Infrastructure.Data.Migrations
                     b.HasOne("CarRentalService.Domain.Renter", "Renter")
                         .WithMany()
                         .HasForeignKey("RenterId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CarRentalService.Domain.Vehicle", "Vehicle")
                         .WithMany()
                         .HasForeignKey("VehicleId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Renter");

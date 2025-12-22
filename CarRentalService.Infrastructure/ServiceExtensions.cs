@@ -1,6 +1,6 @@
-﻿using CarRentalService.Interfaces.Repositories;
-using CarRentalService.Infrastructure.Data;
+﻿using CarRentalService.Infrastructure.Data;
 using CarRentalService.Infrastructure.Repositories;
+using CarRentalService.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
