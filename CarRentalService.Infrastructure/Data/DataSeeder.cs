@@ -331,7 +331,7 @@ public static class DataSeeder
                     VehicleId = _cobaltVehicle1Id,
                     RenterId = _renter4Id
                 },
-                
+
                 new Rental
                 {
                     Id = _currentRental1Id,
