@@ -36,7 +36,6 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<CarRentalDbContext>();
 
-    await Task.Delay(5000);
     await context.Database.MigrateAsync();
 
     if (!context.VehicleModels.Any())

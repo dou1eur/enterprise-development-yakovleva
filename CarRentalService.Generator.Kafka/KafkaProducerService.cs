@@ -1,4 +1,5 @@
 ﻿using CarRentalService.Generator.Kafka.Services;
+using CarRentalService.TestData.Constants;
 
 namespace CarRentalService.Generator.Kafka;
 
@@ -13,9 +14,9 @@ public class KafkaProducerService(
     IProducerService producerService,
     ILogger<KafkaProducerService> logger) : BackgroundService
 {
-    private readonly int _batchSize = configuration.GetValue<int>("Generator:BatchSize");
-    private readonly int _payloadLimit = configuration.GetValue<int>("Generator:PayloadLimit");
-    private readonly int _waitTimeSeconds = configuration.GetValue<int>("Generator:WaitTime");
+    private readonly int _batchSize = configuration.GetValue<int>("Generator:BatchSize", 10);
+    private readonly int _payloadLimit = configuration.GetValue<int>("Generator:PayloadLimit", 100);
+    private readonly int _waitTimeSeconds = configuration.GetValue<int>("Generator:WaitTime", 5);
 
     /// <summary>
     /// Main execution method for the background service
@@ -23,10 +24,16 @@ public class KafkaProducerService(
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         ValidateConfiguration();
+        ValidateTestData();
 
         logger.LogInformation(
             "Starting generator: {Total} total rentals, {Batch} per batch, {WaitTime}s interval",
             _payloadLimit, _batchSize, _waitTimeSeconds);
+
+        logger.LogInformation(
+            "Using {VehicleCount} vehicles and {RenterCount} renters from TestDataConstants",
+            VehicleIds.All.Length,
+            RenterIds.All.Length);
 
         var sentCount = 0;
 
@@ -61,5 +68,23 @@ public class KafkaProducerService(
 
         if (_waitTimeSeconds <= 0)
             throw new ArgumentException($"Invalid WaitTime: {_waitTimeSeconds}", nameof(_waitTimeSeconds));
+    }
+
+    private void ValidateTestData()
+    {
+        if (VehicleIds.All.Length == 0)
+        {
+            throw new InvalidOperationException("No vehicle IDs available in TestDataConstants");
+        }
+
+        if (RenterIds.All.Length == 0)
+        {
+            throw new InvalidOperationException("No renter IDs available in TestDataConstants");
+        }
+
+        logger.LogInformation(
+            "Test data validated: {VehicleCount} vehicles, {RenterCount} renters",
+            VehicleIds.All.Length,
+            RenterIds.All.Length);
     }
 }

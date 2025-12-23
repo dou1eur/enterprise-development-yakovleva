@@ -21,6 +21,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\CarRentalService\CarRentalService.csproj" />
+		<ProjectReference Include="..\CarRentalService.TestData.Constants\CarRentalService.TestData.Constants.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
